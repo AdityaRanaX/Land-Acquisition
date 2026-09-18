@@ -94,8 +94,40 @@ const getFamilies = async (req, res, next) => {
   }
 };
 
+// @desc Update R&R package delivery status
+// @route PATCH /api/rr/:id
+const updateRRPackage = async (req, res, next) => {
+  try {
+    const { deliveryStatus, status, completionDate, remarks, benefits } = req.body;
+    const rrPackage = await RR.findById(req.params.id);
+
+    if (!rrPackage) {
+      return ApiResponse.notFound(res, 'R&R package not found');
+    }
+
+    const newStatus = deliveryStatus || status;
+    if (newStatus) {
+      rrPackage.deliveryStatus = newStatus;
+    }
+
+    if (completionDate || newStatus === 'COMPLETED') {
+      rrPackage.completionDate = completionDate || new Date();
+    }
+
+    if (remarks) rrPackage.remarks = remarks;
+    if (benefits) rrPackage.benefits = benefits;
+
+    await rrPackage.save();
+
+    return ApiResponse.success(res, rrPackage, 'R&R package updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getRRPackages,
   createRRPackage,
-  getFamilies
+  getFamilies,
+  updateRRPackage
 };

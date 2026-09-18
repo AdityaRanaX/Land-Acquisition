@@ -91,9 +91,56 @@ const verifyParcelGroundSurvey = async (req, res, next) => {
   }
 };
 
+// @desc Update parcel status, resolve discrepancy, or assign field officer
+// @route PATCH /api/parcels/:id
+const updateParcel = async (req, res, next) => {
+  try {
+    const {
+      assignedSurveyor,
+      acquisitionStatus,
+      resolveDiscrepancy,
+      baseMarketRatePerAcreINR,
+      fieldNotes,
+      primaryOwnerName,
+      surveyNumber
+    } = req.body;
+
+    const parcel = await Parcel.findById(req.params.id);
+    if (!parcel) {
+      return ApiResponse.notFound(res, 'Parcel not found');
+    }
+
+    if (assignedSurveyor) {
+      if (!parcel.fieldVerification) parcel.fieldVerification = {};
+      parcel.fieldVerification.verifiedBy = assignedSurveyor;
+    }
+
+    if (resolveDiscrepancy) {
+      if (!parcel.fieldVerification) parcel.fieldVerification = {};
+      parcel.fieldVerification.discrepancyDetected = false;
+      parcel.fieldVerification.discrepancyDetails = `Resolved: ${fieldNotes || 'Verified by District Authority'}`;
+      parcel.acquisitionStatus = 'SURVEY_VERIFIED';
+    } else if (acquisitionStatus) {
+      parcel.acquisitionStatus = acquisitionStatus;
+    }
+
+    if (baseMarketRatePerAcreINR !== undefined) parcel.baseMarketRatePerAcreINR = baseMarketRatePerAcreINR;
+    if (primaryOwnerName) parcel.primaryOwnerName = primaryOwnerName;
+    if (surveyNumber) parcel.surveyNumber = surveyNumber;
+    if (fieldNotes && parcel.fieldVerification) parcel.fieldVerification.fieldNotes = fieldNotes;
+
+    await parcel.save();
+
+    return ApiResponse.success(res, parcel, 'Parcel updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getParcels,
   getParcelById,
   createParcel,
+  updateParcel,
   verifyParcelGroundSurvey
 };

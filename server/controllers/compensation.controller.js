@@ -2,6 +2,7 @@ const Compensation = require('../models/Compensation');
 const Parcel = require('../models/Parcel');
 const ApiResponse = require('../utils/apiResponse');
 const { calculateStatutoryAward, simulateProjectBudget } = require('../services/compensationCalc.service');
+const { createNotification } = require('../services/notification.service');
 
 // @desc Calculate statutory compensation dynamically
 // @route POST /api/compensation/calculate
@@ -87,9 +88,75 @@ const createAward = async (req, res, next) => {
   }
 };
 
+// @desc Get single compensation award
+// @route GET /api/compensation/:id
+const getCompensationById = async (req, res, next) => {
+  try {
+    const award = await Compensation.findById(req.params.id)
+      .populate('parcel')
+      .populate('project', 'name code state')
+      .populate('calculatedBy', 'name email');
+
+    if (!award) {
+      return ApiResponse.notFound(res, 'Compensation award record not found');
+    }
+
+    return ApiResponse.success(res, award, 'Compensation award retrieved');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Update compensation disbursement status (Pending -> Processing -> Paid)
+// @route PATCH /api/compensation/:id
+const updateCompensationStatus = async (req, res, next) => {
+  try {
+    const { disbursementStatus, status, utrTransactionNumber, disbursedAmountINR } = req.body;
+    const award = await Compensation.findById(req.params.id).populate('parcel');
+
+    if (!award) {
+      return ApiResponse.notFound(res, 'Compensation award not found');
+    }
+
+    const newStatus = disbursementStatus || status;
+    if (newStatus) {
+      award.disbursementStatus = newStatus;
+    }
+
+    if (utrTransactionNumber) award.utrTransactionNumber = utrTransactionNumber;
+    if (disbursedAmountINR) award.disbursedAmountINR = disbursedAmountINR;
+
+    if (newStatus === 'DISBURSED' || newStatus === 'PAID') {
+      award.disbursedDate = new Date();
+      if (award.parcel) {
+        await Parcel.findByIdAndUpdate(award.parcel._id || award.parcel, {
+          acquisitionStatus: 'COMPENSATION_PAID'
+        });
+      }
+
+      // Notify citizen if citizen user is mapped
+      await createNotification({
+        recipientRole: 'CITIZEN',
+        title: 'Compensation Disbursed',
+        message: `Statutory compensation of ₹${award.totalGrossAwardINR?.toLocaleString('en-IN') || 'Award'} has been disbursed to your account.`,
+        severity: 'SUCCESS',
+        link: '/citizen/compensation'
+      });
+    }
+
+    await award.save();
+
+    return ApiResponse.success(res, award, 'Compensation status updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   calculateCompensation,
   simulateCompensation,
   getCompensationAwards,
-  createAward
+  getCompensationById,
+  createAward,
+  updateCompensationStatus
 };

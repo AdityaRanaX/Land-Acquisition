@@ -58,8 +58,43 @@ const verifyDocument = async (req, res, next) => {
   }
 };
 
+// @desc Update document verification status (Accept, Reject, Request new doc, Escalate)
+// @route PATCH /api/documents/:id
+const updateDocumentStatus = async (req, res, next) => {
+  try {
+    const { status, action, remarks, mismatchFlags } = req.body;
+    const doc = await Document.findById(req.params.id);
+
+    if (!doc) {
+      return ApiResponse.notFound(res, 'Document not found');
+    }
+
+    if (action === 'ACCEPT') {
+      doc.verificationStatus = 'VERIFIED';
+    } else if (action === 'REJECT') {
+      doc.verificationStatus = 'REJECTED';
+    } else if (action === 'REQUEST_NEW_DOCUMENT') {
+      doc.verificationStatus = 'PENDING';
+    } else if (action === 'ESCALATE') {
+      doc.verificationStatus = 'FLAGGED_DISCREPANCY';
+    } else if (status) {
+      doc.verificationStatus = status;
+    }
+
+    if (remarks) doc.verificationNotes = remarks;
+    if (mismatchFlags) doc.mismatchFlags = mismatchFlags;
+
+    await doc.save();
+
+    return ApiResponse.success(res, doc, 'Document status updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getDocuments,
   uploadDocument,
-  verifyDocument
+  verifyDocument,
+  updateDocumentStatus
 };

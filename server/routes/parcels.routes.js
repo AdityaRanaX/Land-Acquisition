@@ -4,6 +4,7 @@ const {
   getParcels,
   getParcelById,
   createParcel,
+  updateParcel,
   verifyParcelGroundSurvey
 } = require('../controllers/parcels.controller');
 const authenticate = require('../middleware/auth.middleware');
@@ -19,6 +20,12 @@ router.post(
   authorize('CENTRAL_ADMIN', 'STATE_OFFICER', 'DISTRICT_COLLECTOR', 'REQUIRING_AGENCY'),
   audit('CREATE_PARCEL', 'PARCELS'),
   createParcel
+);
+router.patch(
+  '/:id',
+  authorize('CENTRAL_ADMIN', 'STATE_OFFICER', 'DISTRICT_COLLECTOR', 'FIELD_SURVEYOR'),
+  audit('UPDATE_PARCEL', 'PARCELS'),
+  updateParcel
 );
 router.post(
   '/:id/field-verify',
