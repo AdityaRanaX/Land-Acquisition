@@ -1,0 +1,83 @@
+module.exports = [
+  {
+    code: 'NHAI-PUNE-BLR-001',
+    name: 'Pune-Bengaluru Green Expressway (Package 4A)',
+    description: 'Greenfield 8-lane access controlled highway acquisition across Pune and Satara districts under Bharatmala Pariyojana.',
+    purpose: 'HIGHWAYS_ROADS',
+    requiringAgency: 'National Highways Authority of India (NHAI)',
+    agencyContactEmail: 'nhai.director@nhai.gov.in',
+    state: 'Maharashtra',
+    districts: ['Pune', 'Satara'],
+    status: 'VALUATION_IN_PROGRESS',
+    totalAreaRequiredHectares: 480.5,
+    estimatedBudgetINR: 12500000000,
+    disbursedBudgetINR: 4200000000,
+    beneficiaryCount: 1420,
+    parcelsCount: 650,
+    riskLevel: 'HIGH',
+    milestones: [
+      { section: 'SEC_4_SIA', status: 'COMPLETED', completedDate: new Date('2023-04-10'), gazetteNotificationNumber: 'SIA/PUNE/2023/88' },
+      { section: 'SEC_6_SIA_APPROVAL', status: 'COMPLETED', completedDate: new Date('2023-07-22'), remarks: 'Approved by State SIA Appraisal Committee' },
+      { section: 'SEC_11_PRELIMINARY_NOTIF', status: 'COMPLETED', completedDate: new Date('2023-11-15'), gazetteNotificationNumber: 'MAH-GAZ-2023-4102' },
+      { section: 'SEC_15_OBJECTIONS_HEARING', status: 'COMPLETED', completedDate: new Date('2024-02-18'), remarks: '42 objections disposed' },
+      { section: 'SEC_19_DECLARATION', status: 'COMPLETED', completedDate: new Date('2024-05-10'), gazetteNotificationNumber: 'MAH-GAZ-2024-1189' },
+      { section: 'SEC_23_VALUATION_AWARD', status: 'IN_PROGRESS', targetDate: new Date('2024-10-30') },
+      { section: 'SEC_31_RR_AWARD', status: 'IN_PROGRESS', targetDate: new Date('2024-11-15') },
+      { section: 'SEC_38_POSSESSION', status: 'PENDING', targetDate: new Date('2025-01-30') }
+    ]
+  },
+  {
+    code: 'MRIDC-PUNE-NSK-002',
+    name: 'Pune-Nashik Semi High-Speed Rail Corridor',
+    description: 'Double line electrified broad gauge corridor spanning 235 km across Pune, Ahmednagar and Nashik.',
+    purpose: 'RAILWAYS_CORRIDOR',
+    requiringAgency: 'Maharashtra Rail Infrastructure Development Corp (MRIDC)',
+    agencyContactEmail: 'mridc.pune@railways.gov.in',
+    state: 'Maharashtra',
+    districts: ['Pune', 'Ahmednagar', 'Nashik'],
+    status: 'SECTION_11_PUBLISHED',
+    totalAreaRequiredHectares: 1200.0,
+    estimatedBudgetINR: 28500000000,
+    disbursedBudgetINR: 1100000000,
+    beneficiaryCount: 3800,
+    parcelsCount: 1840,
+    riskLevel: 'CRITICAL',
+    milestones: [
+      { section: 'SEC_4_SIA', status: 'COMPLETED', completedDate: new Date('2023-02-01') },
+      { section: 'SEC_6_SIA_APPROVAL', status: 'COMPLETED', completedDate: new Date('2023-06-15') },
+      { section: 'SEC_11_PRELIMINARY_NOTIF', status: 'COMPLETED', completedDate: new Date('2023-09-20'), gazetteNotificationNumber: 'MAH-GAZ-2023-3801' },
+      { section: 'SEC_15_OBJECTIONS_HEARING', status: 'COMPLETED', completedDate: new Date('2023-12-05') },
+      { section: 'SEC_19_DECLARATION', status: 'DELAYED', targetDate: new Date('2024-09-10'), remarks: 'Statutory 12-month limit approaching' },
+      { section: 'SEC_23_VALUATION_AWARD', status: 'PENDING' },
+      { section: 'SEC_31_RR_AWARD', status: 'PENDING' },
+      { section: 'SEC_38_POSSESSION', status: 'PENDING' }
+    ]
+  },
+  {
+    code: 'MIDC-TAL-IND-003',
+    name: 'Talegaon Industrial & Semiconductor Cluster Extension',
+    description: 'Strategic acquisition for mega industrial electronics hub in Talegaon Dabhade.',
+    purpose: 'INDUSTRIAL_CORRIDOR',
+    requiringAgency: 'Maharashtra Industrial Development Corporation (MIDC)',
+    agencyContactEmail: 'ceo@midcindia.org',
+    state: 'Maharashtra',
+    districts: ['Pune'],
+    status: 'PROPOSAL_SUBMITTED',
+    totalAreaRequiredHectares: 350.0,
+    estimatedBudgetINR: 6500000000,
+    disbursedBudgetINR: 0,
+    beneficiaryCount: 620,
+    parcelsCount: 280,
+    riskLevel: 'LOW',
+    milestones: [
+      { section: 'SEC_4_SIA', status: 'IN_PROGRESS', targetDate: new Date('2024-11-20') },
+      { section: 'SEC_6_SIA_APPROVAL', status: 'PENDING' },
+      { section: 'SEC_11_PRELIMINARY_NOTIF', status: 'PENDING' },
+      { section: 'SEC_15_OBJECTIONS_HEARING', status: 'PENDING' },
+      { section: 'SEC_19_DECLARATION', status: 'PENDING' },
+      { section: 'SEC_23_VALUATION_AWARD', status: 'PENDING' },
+      { section: 'SEC_31_RR_AWARD', status: 'PENDING' },
+      { section: 'SEC_38_POSSESSION', status: 'PENDING' }
+    ]
+  }
+];

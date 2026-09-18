@@ -1,0 +1,29 @@
+{
+  "name": "nlams-monorepo",
+  "version": "1.0.0",
+  "description": "SIH26016 - National Land Acquisition & Management System (NLAMS) Monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "seed": "cd server && npm run seed",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "sih2024",
+    "sih26016",
+    "land-acquisition",
+    "rfctlarr",
+    "gis",
+    "mou"
+  ],
+  "author": "SIH Team",
+  "license": "MIT"
+}
