@@ -7,5 +7,6 @@ router.use(authenticate);
 
 router.get('/', getMyNotifications);
 router.put('/:id/read', markAsRead);
+router.patch('/:id/read', markAsRead);
 
 module.exports = router;

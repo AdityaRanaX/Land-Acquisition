@@ -5,8 +5,13 @@ const Parcel = require('../models/Parcel');
 /**
  * Heuristic rules engine that evaluates projects for statutory RFCTLARR bottlenecks
  */
-const evaluateProjectDelays = async (projectId) => {
-  const project = await Project.findById(projectId);
+const evaluateProjectDelays = async (projectId, jurisdictionFilter = {}) => {
+  const projectFilter = { _id: projectId };
+  if (jurisdictionFilter.state) projectFilter.state = jurisdictionFilter.state;
+  if (jurisdictionFilter.district) projectFilter.districts = jurisdictionFilter.district;
+  if (jurisdictionFilter.requiringAgency) projectFilter.requiringAgency = jurisdictionFilter.requiringAgency;
+
+  const project = await Project.findOne(projectFilter);
   if (!project) return null;
 
   const now = new Date();
@@ -81,13 +86,18 @@ const evaluateProjectDelays = async (projectId) => {
 /**
  * Scan all active projects for radar alerts
  */
-const scanAllProjectsForDelays = async () => {
-  const projects = await Project.find({
+const scanAllProjectsForDelays = async (jurisdictionFilter = {}) => {
+  const filter = {
     status: { $nin: ['COMPLETED', 'LITIGATION_STAYED'] }
-  });
+  };
+  if (jurisdictionFilter.state) filter.state = jurisdictionFilter.state;
+  if (jurisdictionFilter.district) filter.districts = jurisdictionFilter.district;
+  if (jurisdictionFilter.requiringAgency) filter.requiringAgency = jurisdictionFilter.requiringAgency;
+
+  const projects = await Project.find(filter);
 
   const radarResults = await Promise.all(
-    projects.map((p) => evaluateProjectDelays(p._id))
+    projects.map((p) => evaluateProjectDelays(p._id, jurisdictionFilter))
   );
 
   return radarResults.filter(Boolean);

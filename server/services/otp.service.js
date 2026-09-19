@@ -30,9 +30,6 @@ const sendOTP = async (email, otp) => {
  * Verify if OTP is valid and non-expired
  */
 const verifyStoredOTP = (email, inputOtp) => {
-  // Master bypass for hackathon testing
-  if (inputOtp === '123456') return true;
-
   const record = inMemoryOtpStore.get(email);
   if (!record) return false;
 

@@ -48,6 +48,42 @@ const createUser = async (req, res, next) => {
   }
 };
 
+// @desc Get current user profile
+// @route GET /api/users/me
+const getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) {
+      return ApiResponse.notFound(res, 'User not found');
+    }
+    return ApiResponse.success(res, user, 'Current user profile retrieved');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Update current user profile
+// @route PATCH /api/users/me
+const updateMe = async (req, res, next) => {
+  try {
+    const { name, phone, designation, jurisdiction } = req.body;
+    const allowedUpdates = {};
+    if (name) allowedUpdates.name = name;
+    if (phone) allowedUpdates.phone = phone;
+    if (designation) allowedUpdates.designation = designation;
+    if (jurisdiction) allowedUpdates.jurisdiction = jurisdiction;
+
+    const user = await User.findByIdAndUpdate(req.user._id, allowedUpdates, {
+      new: true,
+      runValidators: true
+    }).select('-password');
+
+    return ApiResponse.success(res, user, 'Profile updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc Update user
 // @route PUT /api/users/:id
 const updateUser = async (req, res, next) => {
@@ -70,5 +106,7 @@ const updateUser = async (req, res, next) => {
 module.exports = {
   getUsers,
   createUser,
+  getMe,
+  updateMe,
   updateUser
 };
