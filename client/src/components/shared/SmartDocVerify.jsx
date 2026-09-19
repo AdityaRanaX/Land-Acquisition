@@ -1,57 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { FileCheck, Sparkles, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Sparkles, CheckCircle2, FileText } from 'lucide-react';
 import apiClient from '../../services/api/apiClient';
 
 export const SmartDocVerify = ({ documentData = null }) => {
-  const [doc, setDoc] = useState(
-    documentData || {
-      _id: 'doc_1',
-      title: '7/12 Extract (Record of Rights) - Survey #142/1A',
-      docType: 'EXTRACT_7_12_ROR',
-      verificationStatus: 'AI_VERIFIED',
-      ocrExtractedData: {
-        ownerName: 'Ramesh Tukaram Patil',
-        surveyNumber: '142/1A',
-        areaMatched: true,
-        confidenceScore: 0.98,
-        extractedText: 'MahaBhumi Digital Extract: Wagholi, Haveli. Survey 142/1A area 1.01 Ha in name of Ramesh Tukaram Patil.'
-      },
-      verificationRemarks: 'AI verification matched 100% against State Land Record database.'
-    }
-  );
+  const [doc, setDoc] = useState(documentData);
   const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setDoc(documentData);
+  }, [documentData]);
 
   const handleRunVerify = async () => {
+    if (!doc?._id) return;
     setVerifying(true);
+    setError(null);
     try {
-      if (doc._id) {
-        const res = await apiClient.post(`/documents/${doc._id}/verify`);
-        if (res.data?.data) {
-          setDoc((prev) => ({
-            ...prev,
-            verificationStatus: res.data.data.status,
-            verificationRemarks: res.data.data.remarks,
-            ocrExtractedData: {
-              ...prev.ocrExtractedData,
-              confidenceScore: res.data.data.confidence
-            }
-          }));
-        }
+      const res = await apiClient.post(`/documents/${doc._id}/verify`);
+      if (res.data?.data) {
+        setDoc((prev) => ({
+          ...prev,
+          verificationStatus: res.data.data.status || 'AI_VERIFIED',
+          verificationRemarks: res.data.data.remarks || 'Verification complete',
+          ocrExtractedData: {
+            ...prev?.ocrExtractedData,
+            confidenceScore: res.data.data.confidence ?? 0.95
+          }
+        }));
       }
     } catch (e) {
-      // Mock response
-      setDoc((prev) => ({
-        ...prev,
-        verificationStatus: 'AI_VERIFIED',
-        verificationRemarks: 'Automated OCR verification passed. Title and survey boundaries authenticated.'
-      }));
+      setError(e.response?.data?.message || 'Verification scan failed on server');
     } finally {
       setVerifying(false);
     }
   };
+
+  if (!doc) {
+    return (
+      <Card
+        title="Smart OCR & Title Verification"
+        subtitle="AI-driven mismatch detection between uploaded deeds and revenue records"
+      >
+        <div className="p-8 text-center border border-dashed border-[#DDD3C7] rounded-xl bg-[#F8F4ED]">
+          <FileText className="w-8 h-8 text-[#6C625B] mx-auto opacity-70" />
+          <p className="text-xs font-semibold text-[#4A2E1B] mt-2">No document selected for verification</p>
+          <p className="text-[11px] text-[#6C625B] mt-1">Select an active document from the list to view or trigger automated OCR verification.</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card
@@ -70,46 +70,56 @@ export const SmartDocVerify = ({ documentData = null }) => {
       }
     >
       <div className="space-y-4 text-xs">
-        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+        {error && (
+          <div className="p-3 rounded-lg bg-[#FAF3E0] border border-[#DDD3C7] text-xs text-[#B84D28]">
+            {error}
+          </div>
+        )}
+
+        <div className="p-3.5 rounded-xl bg-[#F8F4ED] border border-[#DDD3C7] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-200 text-sm">{doc.title}</span>
+            <span className="font-semibold text-[#4A2E1B] text-sm">{doc.title || doc.documentType}</span>
             <Badge
               variant={
-                doc.verificationStatus === 'AI_VERIFIED'
+                doc.verificationStatus === 'AI_VERIFIED' || doc.verificationStatus === 'VERIFIED'
                   ? 'success'
-                  : doc.verificationStatus === 'REJECTED_MISMATCH'
+                  : doc.verificationStatus === 'REJECTED' || doc.verificationStatus === 'REJECTED_MISMATCH'
                   ? 'danger'
                   : 'warning'
               }
               dot
             >
-              {doc.verificationStatus}
+              {doc.verificationStatus || 'PENDING'}
             </Badge>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-2 border-t border-slate-900 text-slate-400">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-2 border-t border-[#DDD3C7] text-[#6C625B]">
             <div>
-              <span className="text-[10px] uppercase text-slate-500 block">Extracted Owner</span>
-              <span className="text-slate-200 font-medium">{doc.ocrExtractedData?.ownerName || 'N/A'}</span>
+              <span className="text-[10px] uppercase text-[#6C625B] block">Extracted Owner</span>
+              <span className="text-[#4A2E1B] font-medium">{doc.ocrExtractedData?.ownerName || 'N/A'}</span>
             </div>
             <div>
-              <span className="text-[10px] uppercase text-slate-500 block">Survey Number</span>
-              <span className="text-slate-200 font-medium">{doc.ocrExtractedData?.surveyNumber || 'N/A'}</span>
+              <span className="text-[10px] uppercase text-[#6C625B] block">Survey Number</span>
+              <span className="text-[#4A2E1B] font-medium">{doc.ocrExtractedData?.surveyNumber || 'N/A'}</span>
             </div>
             <div>
-              <span className="text-[10px] uppercase text-slate-500 block">AI Match Confidence</span>
-              <span className="text-emerald-400 font-bold">
-                {(doc.ocrExtractedData?.confidenceScore * 100).toFixed(0)}%
+              <span className="text-[10px] uppercase text-[#6C625B] block">AI Match Confidence</span>
+              <span className="text-[#B84D28] font-bold">
+                {doc.ocrExtractedData?.confidenceScore
+                  ? `${(doc.ocrExtractedData.confidenceScore * 100).toFixed(0)}%`
+                  : 'N/A'}
               </span>
             </div>
           </div>
         </div>
 
         {/* Verification Summary */}
-        <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-200 flex items-start gap-2.5">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-sky-400 mt-0.5" />
-          <p className="leading-relaxed">{doc.verificationRemarks}</p>
-        </div>
+        {doc.verificationRemarks && (
+          <div className="p-3 rounded-xl bg-[#EAD8CE] border border-[#B84D28]/30 text-[#4A2E1B] flex items-start gap-2.5">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#B84D28] mt-0.5" />
+            <p className="leading-relaxed">{doc.verificationRemarks}</p>
+          </div>
+        )}
       </div>
     </Card>
   );

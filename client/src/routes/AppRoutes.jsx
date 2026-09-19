@@ -30,11 +30,17 @@ import StateEscalations from '../pages/state/StateEscalations';
 import DistrictDashboard from '../pages/district/DistrictDashboard';
 import DistrictProjects from '../pages/district/DistrictProjects';
 import DistrictProjectDetails from '../pages/district/DistrictProjectDetails';
+import DistrictGIS from '../pages/district/DistrictGIS';
 import DistrictParcels from '../pages/district/DistrictParcels';
 import DistrictParcelDetails from '../pages/district/DistrictParcelDetails';
 import DistrictFamilies from '../pages/district/DistrictFamilies';
 import DistrictRR from '../pages/district/DistrictRR';
 import DistrictDocuments from '../pages/district/DistrictDocuments';
+import DistrictCompensation from '../pages/district/DistrictCompensation';
+import DistrictFieldOfficers from '../pages/district/DistrictFieldOfficers';
+import DistrictDelayRadar from '../pages/district/DistrictDelayRadar';
+import DistrictNotifications from '../pages/district/DistrictNotifications';
+import DistrictProfile from '../pages/district/DistrictProfile';
 import SIAWorkflow from '../pages/district/SIAWorkflow';
 import SectionTracker from '../pages/district/SectionTracker';
 import LandValuation from '../pages/district/LandValuation';
@@ -107,11 +113,17 @@ export const AppRoutes = () => {
           <Route path="/district" element={<DistrictDashboard />} />
           <Route path="/district/projects" element={<DistrictProjects />} />
           <Route path="/district/projects/:id" element={<DistrictProjectDetails />} />
+          <Route path="/district/gis" element={<DistrictGIS />} />
           <Route path="/district/parcels" element={<DistrictParcels />} />
           <Route path="/district/parcels/:id" element={<DistrictParcelDetails />} />
           <Route path="/district/families" element={<DistrictFamilies />} />
           <Route path="/district/rr" element={<DistrictRR />} />
           <Route path="/district/documents" element={<DistrictDocuments />} />
+          <Route path="/district/compensation" element={<DistrictCompensation />} />
+          <Route path="/district/field-officers" element={<DistrictFieldOfficers />} />
+          <Route path="/district/delay-radar" element={<DistrictDelayRadar />} />
+          <Route path="/district/notifications" element={<DistrictNotifications />} />
+          <Route path="/district/profile" element={<DistrictProfile />} />
           <Route path="/district/sia" element={<SIAWorkflow />} />
           <Route path="/district/tracker" element={<SectionTracker />} />
           <Route path="/district/valuation" element={<LandValuation />} />

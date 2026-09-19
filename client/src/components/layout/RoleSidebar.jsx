@@ -20,7 +20,9 @@ import {
   HelpCircle,
   TrendingUp,
   RefreshCw,
-  LandPlot
+  LandPlot,
+  Bell,
+  User
 } from 'lucide-react';
 
 export const RoleSidebar = () => {
@@ -42,12 +44,18 @@ export const RoleSidebar = () => {
       { label: 'State Level Escalations', to: '/state/escalations', icon: AlertTriangle }
     ],
     [ROLES.DISTRICT_COLLECTOR]: [
-      { label: 'LAA Collector Dashboard', to: '/district', icon: LayoutDashboard, exact: true },
+      { label: 'Collector Dashboard', to: '/district', icon: LayoutDashboard, exact: true },
       { label: 'Projects', to: '/district/projects', icon: Building2 },
+      { label: 'GIS Cadastral Map', to: '/district/gis', icon: MapPin },
       { label: 'Parcels', to: '/district/parcels', icon: LandPlot },
       { label: 'Families', to: '/district/families', icon: Users },
-      { label: 'R&R', to: '/district/rr', icon: Building2 },
       { label: 'Documents', to: '/district/documents', icon: FileCheck2 },
+      { label: 'Compensation & Awards', to: '/district/compensation', icon: Coins },
+      { label: 'R&R Packages', to: '/district/rr', icon: Building2 },
+      { label: 'Field Officers', to: '/district/field-officers', icon: Users },
+      { label: 'Delay Radar', to: '/district/delay-radar', icon: AlertTriangle },
+      { label: 'Notifications', to: '/district/notifications', icon: Bell },
+      { label: 'Officer Profile', to: '/district/profile', icon: User },
       { label: 'SIA Workflow (Sec 4-6)', to: '/district/sia', icon: Users },
       { label: 'Section Tracker (4, 11, 19)', to: '/district/tracker', icon: FileSpreadsheet },
       { label: 'Land Valuation Engine', to: '/district/valuation', icon: Calculator },
