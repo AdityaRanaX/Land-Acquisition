@@ -1,4 +1,6 @@
 const Grievance = require('../models/Grievance');
+const Project = require('../models/Project');
+const Parcel = require('../models/Parcel');
 const ApiResponse = require('../utils/apiResponse');
 const { createNotification } = require('../services/notification.service');
 
@@ -12,6 +14,22 @@ const getGrievances = async (req, res, next) => {
     // Citizens only see their own grievances
     if (req.user.role === 'CITIZEN') {
       filter.citizen = req.user._id;
+    } else if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      const [projects, parcels] = await Promise.all([
+        Project.find({ state: req.user.jurisdiction?.state, districts: req.user.jurisdiction?.district }).select('_id'),
+        Parcel.find({ state: req.user.jurisdiction?.state, district: req.user.jurisdiction?.district }).select('_id')
+      ]);
+      filter.$or = [
+        { project: { $in: projects.map((project) => project._id) } },
+        { parcel: { $in: parcels.map((parcel) => parcel._id) } },
+        { assignedOfficer: req.user._id }
+      ];
+    } else if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      const projects = await Project.find({ state: req.user.jurisdiction.state }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'REQUIRING_AGENCY' && req.user.jurisdiction?.agencyName) {
+      const projects = await Project.find({ requiringAgency: req.user.jurisdiction.agencyName }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
     }
 
     if (status) filter.status = status;

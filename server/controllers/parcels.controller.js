@@ -7,6 +7,7 @@ const getParcels = async (req, res, next) => {
   try {
     const { projectId, district, village, status, unverifiedOnly } = req.query;
     const filter = { ...req.jurisdictionFilter };
+    delete filter.projectDistrict;
 
     if (projectId) filter.project = projectId;
     if (district) filter.district = district;
@@ -31,7 +32,15 @@ const getParcels = async (req, res, next) => {
 // @route GET /api/parcels/:id
 const getParcelById = async (req, res, next) => {
   try {
-    const parcel = await Parcel.findById(req.params.id)
+    const filter = { _id: req.params.id };
+    if (req.user.role === 'STATE_OFFICER') filter.state = req.user.jurisdiction?.state;
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      filter.state = req.user.jurisdiction?.state;
+      filter.district = req.user.jurisdiction?.district;
+    }
+    if (req.user.role === 'CITIZEN') filter.citizenUser = req.user._id;
+
+    const parcel = await Parcel.findOne(filter)
       .populate('project')
       .populate('citizenUser', 'name email phone');
 
