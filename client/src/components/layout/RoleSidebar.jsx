@@ -72,11 +72,11 @@ export const RoleSidebar = () => {
   const navItems = roleNavItems[role] || roleNavItems[ROLES.CENTRAL_ADMIN];
 
   return (
-    <aside className="w-64 flex-shrink-0 min-h-[calc(100vh-57px)] bg-slate-950 border-r border-slate-800 p-4 flex flex-col justify-between">
+    <aside className="w-64 flex-shrink-0 min-h-[calc(100vh-57px)] bg-[#F8F4ED] border-r border-[#DDD3C7] p-4 flex flex-col justify-between">
       <div>
         <div className="px-3 py-2 mb-3">
-          <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Navigation Menu</p>
-          <p className="text-xs font-medium text-slate-300 capitalize">{role?.toLowerCase().replace('_', ' ')} Workspace</p>
+          <p className="text-[11px] font-semibold tracking-wider text-[#6C625B] uppercase">Navigation Menu</p>
+          <p className="text-xs font-medium text-[#4A2E1B] capitalize">{role?.toLowerCase().replace('_', ' ')} Workspace</p>
         </div>
         <nav className="space-y-1">
           {navItems.map((item) => {
@@ -87,10 +87,10 @@ export const RoleSidebar = () => {
                 to={item.to}
                 end={item.exact}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                  `flex items-center gap-3 px-3 py-3 rounded-none text-xs font-medium transition-colors ${
                     isActive
-                      ? 'bg-sky-600/15 text-sky-400 border border-sky-500/20 shadow-sm font-semibold'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                      ? 'bg-[#EAD8CE] text-[#B84D28] border-l-2 border-[#B84D28] font-semibold'
+                      : 'text-[#6C625B] hover:text-[#4A2E1B] hover:bg-[#EFE7DC]'
                   }`
                 }
               >
@@ -103,13 +103,13 @@ export const RoleSidebar = () => {
       </div>
 
       {/* Jurisdiction Footer info */}
-      <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
-        <p className="text-[10px] uppercase font-semibold text-slate-500">Jurisdiction Active</p>
-        <p className="font-semibold text-slate-200 mt-0.5">
+      <div className="p-3 border-t border-[#DDD3C7] text-xs">
+        <p className="text-[10px] uppercase font-semibold text-[#6C625B]">Jurisdiction Active</p>
+        <p className="font-semibold text-[#4A2E1B] mt-0.5">
           {user?.jurisdiction?.state || 'National (All India)'}
         </p>
         {user?.jurisdiction?.district && (
-          <p className="text-[11px] text-slate-400">{user.jurisdiction.district} District</p>
+          <p className="text-[11px] text-[#6C625B]">{user.jurisdiction.district} District</p>
         )}
       </div>
     </aside>
