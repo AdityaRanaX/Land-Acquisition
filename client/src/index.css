@@ -1,43 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-[#F8F4ED] text-[#4A2E1B] min-h-screen font-sans;
+    @apply bg-page text-text-primary min-h-screen font-sans antialiased selection:bg-buff/40 selection:text-bistre;
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar for dense government data */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #EFE7DC;
+  background: #F3EFEA;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C7B8A8;
+  background: #C4B5A5;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B84D28;
+  background: #A08965;
 }
 
-/* Glassmorphism Classes */
-.glass-panel {
-  background: #F8F4ED;
-  border: 1px solid #DDD3C7;
-}
-
-.glass-card {
-  background: #F8F4ED;
-  border: 1px solid #DDD3C7;
-}
-
-.glass-header {
-  background: #F8F4ED;
-  border-bottom: 1px solid #DDD3C7;
+/* Solid Opaque Card Utility */
+.nlams-card {
+  @apply bg-surface rounded-xl border border-chamoisee/25 shadow-card transition-all;
 }
 
 /* Leaflet Container Defaults */

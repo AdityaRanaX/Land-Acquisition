@@ -3,66 +3,32 @@ import { KPICard } from '../../components/ui/KPICard';
 import { Card } from '../../components/ui/Card';
 import { Table } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 import { GISMap } from '../../components/gis/GISMap';
 import { DelayRadar } from '../../components/shared/DelayRadar';
-import { useGIS } from '../../hooks/useGIS';
-import { Building2, LandPlot, Coins, AlertTriangle, TrendingUp, ShieldCheck } from 'lucide-react';
-import apiClient from '../../services/api/apiClient';
+import { getProjects } from '../../services/projectService';
+import { getParcelsGeoJSON } from '../../services/parcelService';
+import { Building2, LandPlot, Coins, AlertTriangle, ArrowRight, Eye, Map, Download } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const CentralDashboard = () => {
-  const { geoJsonData, stats } = useGIS();
   const [projects, setProjects] = useState([]);
+  const [geoJsonData, setGeoJsonData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await apiClient.get('/projects');
-        if (res.data?.data) {
-          setProjects(res.data.data);
-        }
-      } catch (e) {
-        setProjects([
-          {
-            _id: 'p1',
-            code: 'NHAI-PUNE-BLR-001',
-            name: 'Pune-Bengaluru Green Expressway',
-            state: 'Maharashtra',
-            totalAreaRequiredHectares: 480.5,
-            status: 'VALUATION_IN_PROGRESS',
-            riskLevel: 'HIGH'
-          },
-          {
-            _id: 'p2',
-            code: 'MRIDC-PUNE-NSK-002',
-            name: 'Pune-Nashik Semi High-Speed Rail',
-            state: 'Maharashtra',
-            totalAreaRequiredHectares: 1200.0,
-            status: 'SECTION_11_PUBLISHED',
-            riskLevel: 'CRITICAL'
-          },
-          {
-            _id: 'p3',
-            code: 'MIDC-TAL-IND-003',
-            name: 'Talegaon Industrial & Semiconductor Cluster',
-            state: 'Maharashtra',
-            totalAreaRequiredHectares: 350.0,
-            status: 'PROPOSAL_SUBMITTED',
-            riskLevel: 'LOW'
-          }
-        ]);
-      }
-    };
-    fetchProjects();
+    getProjects().then(setProjects);
+    getParcelsGeoJSON().then(setGeoJsonData);
   }, []);
 
   const projectColumns = [
     {
-      title: 'Code / Name',
+      title: 'Project Code / Name',
       key: 'name',
       render: (_, row) => (
         <div>
-          <span className="font-mono font-bold text-sky-400 text-xs">{row.code}</span>
-          <p className="font-semibold text-slate-100 text-sm mt-0.5">{row.name}</p>
+          <span className="font-mono font-bold text-kobicha text-xs">{row.code}</span>
+          <p className="font-bold text-bistre text-xs mt-0.5">{row.name}</p>
         </div>
       )
     },
@@ -75,55 +41,72 @@ export const CentralDashboard = () => {
     {
       title: 'Workflow Stage',
       key: 'status',
-      render: (val) => (
-        <Badge variant={val === 'VALUATION_IN_PROGRESS' ? 'primary' : val === 'SECTION_11_PUBLISHED' ? 'warning' : 'default'}>
-          {val?.replace(/_/g, ' ')}
-        </Badge>
-      )
+      render: (val) => <Badge status={val}>{val?.replace(/_/g, ' ')}</Badge>
     },
     {
       title: 'Delay Risk',
       key: 'riskLevel',
-      render: (val) => (
-        <Badge variant={val === 'CRITICAL' ? 'danger' : val === 'HIGH' ? 'warning' : 'success'} dot>
-          {val}
-        </Badge>
+      render: (val) => <Badge status={val} dot>{val}</Badge>
+    },
+    {
+      title: 'Action',
+      key: 'act',
+      render: (_, row) => (
+        <Link to={`/central/projects/${row.id}`}>
+          <Button size="sm" variant="outline" icon={Eye}>Inspect</Button>
+        </Link>
       )
     }
   ];
 
   return (
     <div className="space-y-6">
+      {/* Top Welcome & Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-black text-bistre tracking-tight">National Land Acquisition Oversight</h2>
+          <p className="text-xs text-text-muted">Department of Land Resources (DoLR) • Central Monitoring Dashboard</p>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Link to="/central/map">
+            <Button variant="outline" icon={Map}>National GIS Map</Button>
+          </Link>
+          <Link to="/central/reports">
+            <Button variant="primary" icon={Download}>Export National Report</Button>
+          </Link>
+        </div>
+      </div>
+
       {/* KPI Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title="Active National Projects"
           value={projects.length || '3'}
           subtitle="Across 28 States & UTs"
           icon={Building2}
-          color="sky"
-          trend={{ text: '12% MoM', isPositive: true, label: 'Pipeline' }}
+          color="kobicha"
+          trend={{ text: '12% YoY', isPositive: true, label: 'Pipeline growth' }}
         />
         <KPICard
-          title="Total Land Notified"
+          title="Total Notified Footprint"
           value="2,030.5 Ha"
-          subtitle="65% Verified by GIS Field Ground Truth"
+          subtitle="65% Verified by Field Ground Truth"
           icon={LandPlot}
-          color="emerald"
+          color="success"
         />
         <KPICard
-          title="National Outlay & Escrow"
-          value="₹47,500 Cr"
-          subtitle="₹5,300 Cr Disbursed to Affected Families"
+          title="National Escrow Disbursed"
+          value="₹5,300 Cr"
+          subtitle="Out of ₹47,500 Cr Allocated"
           icon={Coins}
-          color="purple"
+          color="info"
         />
         <KPICard
-          title="Statutory Delay Radar"
+          title="Statutory Lapse Alerts"
           value="1 Critical"
-          subtitle="Sec 19 Lapse Window Nearing"
+          subtitle="Sec 19 Declaration < 30 Days"
           icon={AlertTriangle}
-          color="rose"
+          color="danger"
           trend={{ text: 'Action Req', isPositive: false }}
         />
       </div>
@@ -132,22 +115,36 @@ export const CentralDashboard = () => {
       <Card
         title="Live National Land Acquisition GIS Cadastral Map"
         subtitle="Multi-layer spatial tracking of survey polygons, land classification & ground inspections"
+        action={
+          <Link to="/central/map">
+            <Button size="sm" variant="outline" icon={ArrowRight}>Full GIS View</Button>
+          </Link>
+        }
       >
         <GISMap
           features={geoJsonData?.features || []}
-          stats={stats}
-          height="450px"
+          height="400px"
+          onSelectParcel={(p) => navigate('/district/parcels')}
         />
       </Card>
 
-      {/* Grid: Projects and Delay Radar */}
+      {/* Grid: Priority Projects and Delay Radar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card
-            title="Strategic Infrastructure Acquisitions"
-            subtitle="Priority corridors under PM Gati Shakti & Bharatmala"
+            title="Strategic Infrastructure Corridors"
+            subtitle="Priority corridors under PM Gati Shakti & Bharatmala Pariyojana"
+            action={
+              <Link to="/central/projects">
+                <Button size="sm" variant="outline" icon={ArrowRight}>View All</Button>
+              </Link>
+            }
           >
-            <Table columns={projectColumns} data={projects} />
+            <Table
+              columns={projectColumns}
+              data={projects}
+              onRowClick={(row) => navigate(`/central/projects/${row.id}`)}
+            />
           </Card>
         </div>
         <div>

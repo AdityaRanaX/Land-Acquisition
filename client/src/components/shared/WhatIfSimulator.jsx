@@ -3,8 +3,8 @@ import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
-import { Calculator, Sparkles, TrendingUp, IndianRupee } from 'lucide-react';
-import apiClient from '../../services/api/apiClient';
+import { Calculator } from 'lucide-react';
+import { calculateStatutoryAward } from '../../services/compensationService';
 
 export const WhatIfSimulator = () => {
   const [inputs, setInputs] = useState({
@@ -30,33 +30,9 @@ export const WhatIfSimulator = () => {
 
   const calculate = async () => {
     setLoading(true);
-    try {
-      const res = await apiClient.post('/compensation/calculate', inputs);
-      if (res.data?.data) {
-        setResult(res.data.data);
-      }
-    } catch (e) {
-      // Local fallback formula
-      const basic = inputs.baseMarketValuePerAcre * inputs.acquiredAreaAcres;
-      const mult = inputs.urbanOrRural === 'URBAN' ? 1.0 : inputs.distanceFactor;
-      const multipliedLand = basic * mult;
-      const assets = Number(inputs.assetsStructures) + Number(inputs.assetsTreesCrops);
-      const baseTotal = multipliedLand + assets;
-      const solatium = baseTotal; // 100%
-      const interest = multipliedLand * 0.12 * (inputs.interestDays / 365);
-      const total = Math.round(baseTotal + solatium + interest);
-
-      setResult({
-        basicLandValue: Math.round(basic),
-        multipliedLandValue: Math.round(multipliedLand),
-        totalBaseAssetAndLandValue: Math.round(baseTotal),
-        solatiumAmount: Math.round(solatium),
-        interest12PercentAdditionalValue: Math.round(interest),
-        totalGrossAwardINR: total
-      });
-    } finally {
-      setLoading(false);
-    }
+    const res = await calculateStatutoryAward(inputs);
+    setResult(res);
+    setLoading(false);
   };
 
   const formatINR = (val) => {
@@ -65,12 +41,12 @@ export const WhatIfSimulator = () => {
 
   return (
     <Card
-      title="RFCTLARR Statutory 'What-If' Award Simulator"
-      subtitle="Simulate Schedule I Multipliers, 100% Solatium (Sec 30) & 12% Interest (Sec 30(3))"
-      action={<Calculator className="w-4 h-4 text-sky-400" />}
+      title="Statutory Schedule I Compensation Calculator"
+      subtitle="Model RFCTLARR Section 26 Multipliers, 100% Solatium (Sec 30) & 12% Interest (Sec 30(3))"
+      action={<Calculator className="w-4 h-4 text-kobicha" />}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Inputs */}
+        {/* Form Inputs */}
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Input
@@ -126,7 +102,7 @@ export const WhatIfSimulator = () => {
           </div>
 
           <Input
-            label="Elapsed Days from Sec 11 Notification"
+            label="Elapsed Days since Sec 11 Notification"
             type="number"
             value={inputs.interestDays}
             helperText="Applies 12% per annum additional market value under Sec 30(3)"
@@ -139,38 +115,38 @@ export const WhatIfSimulator = () => {
         </div>
 
         {/* Breakdown Output */}
-        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col justify-between space-y-4">
+        <div className="p-4 rounded-xl bg-[#FDFBF7] border border-chamoisee/25 flex flex-col justify-between space-y-4">
           <div>
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Award Breakdown</span>
-            <div className="mt-3 space-y-2.5 text-xs text-slate-300">
-              <div className="flex justify-between pb-1 border-b border-slate-900">
-                <span className="text-slate-400">Basic Land Value (Area × Rate):</span>
+            <span className="text-xs font-bold text-bistre uppercase tracking-wider block">Award Itemized Breakdown</span>
+            <div className="mt-3 space-y-2.5 text-xs text-text-primary">
+              <div className="flex justify-between pb-1 border-b border-chamoisee/15">
+                <span className="text-text-muted">Basic Land Value (Area × Rate):</span>
                 <span className="font-semibold">{formatINR(result.basicLandValue)}</span>
               </div>
-              <div className="flex justify-between pb-1 border-b border-slate-900">
-                <span className="text-slate-400">Multiplied Value (Factor {inputs.urbanOrRural === 'URBAN' ? '1.0' : inputs.distanceFactor}x):</span>
-                <span className="font-semibold text-sky-400">{formatINR(result.multipliedLandValue)}</span>
+              <div className="flex justify-between pb-1 border-b border-chamoisee/15">
+                <span className="text-text-muted">Multiplied Value (Factor {inputs.urbanOrRural === 'URBAN' ? '1.0' : inputs.distanceFactor}x):</span>
+                <span className="font-bold text-kobicha">{formatINR(result.multipliedLandValue)}</span>
               </div>
-              <div className="flex justify-between pb-1 border-b border-slate-900">
-                <span className="text-slate-400">Base Land + Attached Assets:</span>
+              <div className="flex justify-between pb-1 border-b border-chamoisee/15">
+                <span className="text-text-muted">Base Land + Attached Assets:</span>
                 <span className="font-semibold">{formatINR(result.totalBaseAssetAndLandValue)}</span>
               </div>
-              <div className="flex justify-between pb-1 border-b border-slate-900">
-                <span className="text-slate-400">Solatium @ 100% (Sec 30(1)):</span>
-                <span className="font-semibold text-amber-400">{formatINR(result.solatiumAmount)}</span>
+              <div className="flex justify-between pb-1 border-b border-chamoisee/15">
+                <span className="text-text-muted">Solatium @ 100% (Sec 30(1)):</span>
+                <span className="font-bold text-[#8F6A22]">{formatINR(result.solatiumAmount)}</span>
               </div>
-              <div className="flex justify-between pb-1 border-b border-slate-900">
-                <span className="text-slate-400">12% Interest ({inputs.interestDays} days):</span>
-                <span className="font-semibold text-purple-400">{formatINR(result.interest12PercentAdditionalValue)}</span>
+              <div className="flex justify-between pb-1 border-b border-chamoisee/15">
+                <span className="text-text-muted">12% Interest ({inputs.interestDays} days):</span>
+                <span className="font-semibold text-[#3D5665]">{formatINR(result.interest12PercentAdditionalValue)}</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 bg-sky-950/20 p-3 rounded-lg border border-sky-500/20">
-            <span className="text-[11px] font-semibold text-sky-400 uppercase tracking-wider block">
+          <div className="pt-3 border-t border-chamoisee/25 bg-surface p-3.5 rounded-lg border border-chamoisee/30">
+            <span className="text-[11px] font-bold text-chamoisee uppercase tracking-wider block">
               Total Statutory Gross Award (Sec 23/26)
             </span>
-            <h3 className="text-2xl font-black text-emerald-400 mt-1">
+            <h3 className="text-2xl font-black text-[#4D5A34] mt-1 tracking-tight">
               {formatINR(result.totalGrossAwardINR)}
             </h3>
           </div>

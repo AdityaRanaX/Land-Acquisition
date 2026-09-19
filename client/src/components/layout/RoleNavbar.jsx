@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { ROLES, ROLE_LABELS } from '../../constants/roles';
 import { NotificationBell } from '../shared/NotificationBell';
-import { ShieldCheck, ChevronDown, UserCheck, LogOut, Layers } from 'lucide-react';
+import { ShieldCheck, ChevronDown, LogOut, Layers, User, Bell } from 'lucide-react';
 
 export const RoleNavbar = () => {
   const { user, switchRole, logout } = useAuth();
@@ -13,7 +13,6 @@ export const RoleNavbar = () => {
   const handleSwitchRole = (roleKey) => {
     switchRole(roleKey);
     setRoleMenuOpen(false);
-    // Route to appropriate root dashboard
     const roleRoutes = {
       CENTRAL_ADMIN: '/central',
       STATE_OFFICER: '/state',
@@ -26,53 +25,56 @@ export const RoleNavbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#F8F4ED] px-6 py-3 flex items-center justify-between border-b border-[#DDD3C7]">
+    <header className="sticky top-0 z-40 w-full bg-taupe text-white px-6 py-2.5 flex items-center justify-between border-b border-chamoisee/30 shadow-md">
       {/* Brand & Emblem */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 border border-[#B84D28] flex items-center justify-center">
-          <div className="w-full h-full flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-[#B84D28]" />
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-8 h-8 rounded-lg bg-kobicha p-0.5 flex items-center justify-center shadow-md">
+            <ShieldCheck className="w-5 h-5 text-white" />
           </div>
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold tracking-tight text-[#4A2E1B]">NLAMS</h1>
-            <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 text-[#B84D28] border border-[#D9B8A8]">
-              RFCTLARR 2013
-            </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-black tracking-wider text-white">NLAMS</h1>
+              <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-buff/20 text-buff border border-buff/30">
+                RFCTLARR 2013
+              </span>
+            </div>
+            <p className="text-[10px] text-buff/80 leading-none">National Land Acquisition & Management System</p>
           </div>
-          <p className="text-[11px] text-[#6C625B] leading-tight">National Land Acquisition & Management System</p>
-        </div>
+        </Link>
       </div>
 
       {/* Right Controls: Role Switcher, Notifications, Profile */}
-      <div className="flex items-center gap-4">
-        {/* Quick Role Switcher for Hackathon Demo */}
+      <div className="flex items-center gap-3">
+        {/* Quick Role Switcher for Hackathon / Evaluator Persona Switching */}
         <div className="relative">
           <button
             onClick={() => setRoleMenuOpen(!roleMenuOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 border border-[#DDD3C7] hover:border-[#B84D28] text-xs font-medium text-[#4A2E1B] transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bistre/70 border border-chamoisee/40 hover:border-buff text-xs font-semibold text-buff transition-colors cursor-pointer"
           >
-            <Layers className="w-3.5 h-3.5 text-[#B84D28]" />
+            <Layers className="w-3.5 h-3.5 text-buff" />
             <span>Switch Role</span>
-            <ChevronDown className="w-3.5 h-3.5 text-[#6C625B]" />
+            <ChevronDown className="w-3.5 h-3.5 text-buff/70" />
           </button>
 
           {roleMenuOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-[#F8F4ED] border border-[#DDD3C7] py-1 z-50">
-              <div className="px-3 py-2 border-b border-[#DDD3C7] text-[10px] font-semibold text-[#6C625B] uppercase">
-                Select Active Hackathon Persona
+            <div className="absolute right-0 mt-2 w-72 bg-surface border border-chamoisee/30 rounded-xl shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95">
+              <div className="px-3.5 py-2 border-b border-chamoisee/15 text-[11px] font-bold text-bistre uppercase tracking-wider">
+                Select Active User Persona
               </div>
               {Object.entries(ROLES).map(([key, value]) => (
                 <button
                   key={key}
                   onClick={() => handleSwitchRole(key)}
-                  className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#EFE7DC] transition-colors ${
-                    user?.role === value ? 'bg-[#EAD8CE] text-[#B84D28] font-semibold' : 'text-[#6C625B]'
+                  className={`w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between hover:bg-buff/20 transition-colors cursor-pointer ${
+                    user?.role === value ? 'bg-buff/30 text-bistre font-bold' : 'text-text-primary'
                   }`}
                 >
-                  <span>{ROLE_LABELS[key]}</span>
-                  {user?.role === value && <span className="w-1.5 h-1.5 rounded-full bg-[#B84D28]" />}
+                  <div>
+                    <p className="font-semibold">{ROLE_LABELS[key]}</p>
+                    <p className="text-[10px] text-text-muted">{key}</p>
+                  </div>
+                  {user?.role === value && <span className="w-2 h-2 rounded-full bg-kobicha" />}
                 </button>
               ))}
             </div>
@@ -82,19 +84,22 @@ export const RoleNavbar = () => {
         {/* Live Notifications */}
         <NotificationBell />
 
-        {/* User Card & Logout */}
-        <div className="flex items-center gap-3 pl-3 border-l border-[#DDD3C7]">
-          <div className="text-right hidden md:block">
-            <p className="text-xs font-semibold text-[#4A2E1B]">{user?.name || 'Authorized Official'}</p>
-            <p className="text-[11px] text-[#6C625B]">{user?.designation || user?.email}</p>
-          </div>
-          <span className="text-[10px] font-semibold px-2 py-0.5 border border-[#D9B8A8] text-[#B84D28]">
-            {user?.role}
-          </span>
+        {/* User Card & Profile Link */}
+        <div className="flex items-center gap-3 pl-3 border-l border-chamoisee/30">
+          <Link to="/profile" className="flex items-center gap-2.5 text-right hidden sm:flex hover:opacity-90">
+            <div className="w-7 h-7 rounded-full bg-kobicha flex items-center justify-center text-white text-xs font-bold border border-buff/40">
+              {user?.name ? user.name[0] : 'U'}
+            </div>
+            <div>
+              <p className="text-xs font-bold text-white leading-tight">{user?.name || 'Officer'}</p>
+              <p className="text-[10px] text-buff/80 leading-none mt-0.5">{user?.designation || user?.role}</p>
+            </div>
+          </Link>
+
           <button
             onClick={logout}
             title="Logout"
-            className="p-1.5 text-[#6C625B] hover:text-[#B84D28] transition-colors"
+            className="p-1.5 rounded-lg text-buff/80 hover:text-white hover:bg-bistre/50 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
           </button>

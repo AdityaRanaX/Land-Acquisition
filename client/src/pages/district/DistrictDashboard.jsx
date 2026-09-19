@@ -1,39 +1,70 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowUpRight, ChevronDown, Search } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ChevronDown,
+  Coins,
+  Eye,
+  FileSearch,
+  LandPlot,
+  Scale,
+  Search,
+  Users,
+  UserCheck,
+  AlertTriangle,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 import { GISMap } from '../../components/gis/GISMap';
+import { DelayRadar } from '../../components/shared/DelayRadar';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { KPICard } from '../../components/ui/KPICard';
+import { Table } from '../../components/ui/Table';
+
 import { useAuth } from '../../hooks/useAuth';
 import { useGIS } from '../../hooks/useGIS';
 import apiClient from '../../services/api/apiClient';
 
-const FALLBACK_KPIS = { activeProjects: 24, pendingVerification: 186, highRiskCases: 12, compensationPending: '₹8.4 Cr' };
-const FALLBACK_ACTIVITY = [
-  { time: '09:42', action: 'Parcel documents verified', entity: 'Survey 142/1A · Revenue Inspector' },
-  { time: '08:55', action: 'Project approval submitted', entity: 'Pune-Bengaluru Green Expressway' },
-  { time: 'Yesterday', action: 'Field officer assigned to cadastral survey', entity: 'Wagholi Circle · Haveli' },
-  { time: 'Yesterday', action: 'Compensation batch approved for disbursement', entity: 'Ramesh Tukaram Patil' }
-];
-
 const formatActivityTime = (value) => {
   if (!value) return 'Recent';
+
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return Date.now() - date.getTime() > 86400000 ? 'Yesterday' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  const age = Date.now() - date.getTime();
+
+  if (age > 86400000) {
+    return 'Yesterday';
+  }
+
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 };
 
-const StatusDot = ({ tone = 'pending' }) => <span className={`status-dot status-dot-${tone}`} aria-hidden="true" />;
-
-const Kpi = ({ label, value, detail, tone }) => (
-  <article className="district-kpi">
-    <div className="district-kpi-label"><StatusDot tone={tone} />{label}</div>
-    <div className="district-kpi-value">{value}</div>
-    <div className="district-kpi-detail">{detail}</div>
-  </article>
+const StatusDot = ({ tone = 'pending' }) => (
+  <span
+    className={`status-dot status-dot-${tone}`}
+    aria-hidden="true"
+  />
 );
 
 export const DistrictDashboard = () => {
   const { user } = useAuth();
-  const { geoJsonData, stats, setSelectedParcel, loading: gisLoading } = useGIS();
+
+  const {
+    geoJsonData,
+    stats,
+    setSelectedParcel,
+    loading: gisLoading,
+  } = useGIS();
+
   const [projects, setProjects] = useState([]);
   const [parcels, setParcels] = useState([]);
   const [compensation, setCompensation] = useState([]);
@@ -41,91 +72,647 @@ export const DistrictDashboard = () => {
   const [rrPackages, setRrPackages] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [audit, setAudit] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [showMoreStats, setShowMoreStats] = useState(false);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     let mounted = true;
+
     const fetchDashboardData = async () => {
+      setLoading(true);
+
       const requests = await Promise.allSettled([
-        apiClient.get('/projects'), apiClient.get('/parcels'), apiClient.get('/compensation'),
-        apiClient.get('/documents'), apiClient.get('/rr'), apiClient.get('/notifications'), apiClient.get('/audit?limit=6')
+        apiClient.get('/projects'),
+        apiClient.get('/parcels'),
+        apiClient.get('/compensation'),
+        apiClient.get('/documents'),
+        apiClient.get('/rr'),
+        apiClient.get('/notifications'),
+        apiClient.get('/audit?limit=6'),
       ]);
+
       if (!mounted) return;
-      const getData = (index) => requests[index].status === 'fulfilled' ? requests[index].value.data?.data : [];
-      setProjects(Array.isArray(getData(0)) ? getData(0) : []);
-      setParcels(Array.isArray(getData(1)) ? getData(1) : []);
-      setCompensation(Array.isArray(getData(2)) ? getData(2) : []);
-      setDocuments(Array.isArray(getData(3)) ? getData(3) : []);
-      setRrPackages(Array.isArray(getData(4)) ? getData(4) : []);
-      setNotifications(Array.isArray(getData(5)) ? getData(5) : []);
-      setAudit(Array.isArray(getData(6)) ? getData(6) : []);
+
+      const getData = (index) => {
+        const request = requests[index];
+
+        if (request.status !== 'fulfilled') {
+          return [];
+        }
+
+        const data = request.value?.data?.data;
+
+        return Array.isArray(data) ? data : [];
+      };
+
+      setProjects(getData(0));
+      setParcels(getData(1));
+      setCompensation(getData(2));
+      setDocuments(getData(3));
+      setRrPackages(getData(4));
+      setNotifications(getData(5));
+      setAudit(getData(6));
+
       setLoading(false);
     };
+
     fetchDashboardData();
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
+  /*
+   * All KPI values are derived from backend records.
+   * No fallback/demo numbers are used.
+   */
   const kpis = useMemo(() => {
-    const pendingVerification = parcels.filter((parcel) => !parcel.fieldVerification?.isVerified).length;
-    const highRiskCases = projects.filter((project) => ['HIGH', 'CRITICAL'].includes(project.riskLevel)).length + parcels.filter((parcel) => parcel.acquisitionStatus === 'DISPUTED').length;
-    const pendingCompensation = compensation.filter((award) => award.disbursementStatus !== 'DISBURSED').length;
+    const pendingVerification = parcels.filter(
+      (parcel) => !parcel.fieldVerification?.isVerified
+    ).length;
+
+    const highRiskCases =
+      projects.filter((project) =>
+        ['HIGH', 'CRITICAL'].includes(project.riskLevel)
+      ).length +
+      parcels.filter(
+        (parcel) => parcel.acquisitionStatus === 'DISPUTED'
+      ).length;
+
+    const pendingCompensation = compensation.filter(
+      (award) => award.disbursementStatus !== 'DISBURSED'
+    ).length;
+
     return {
-      activeProjects: projects.length || FALLBACK_KPIS.activeProjects,
-      pendingVerification: pendingVerification || FALLBACK_KPIS.pendingVerification,
-      highRiskCases: highRiskCases || FALLBACK_KPIS.highRiskCases,
-      compensationPending: pendingCompensation > 0 ? `₹${(pendingCompensation * 0.28).toFixed(1)} Cr` : FALLBACK_KPIS.compensationPending
+      activeProjects: projects.length,
+      pendingVerification,
+      highRiskCases,
+      compensationPending: pendingCompensation,
     };
   }, [compensation, parcels, projects]);
 
   const activity = useMemo(() => {
-    const auditItems = audit.map((item) => ({ time: formatActivityTime(item.timestamp), action: item.action?.replace(/_/g, ' ').toLowerCase().replace(/^\w/, (letter) => letter.toUpperCase()), entity: item.userEmail || item.module || 'District administration' }));
-    const notificationItems = notifications.slice(0, 4).map((item) => ({ time: formatActivityTime(item.createdAt), action: item.title, entity: item.message }));
-    return [...auditItems, ...notificationItems].slice(0, 4);
+    const auditItems = audit.map((item) => ({
+      time: formatActivityTime(item.timestamp),
+      action:
+        item.action
+          ?.replace(/_/g, ' ')
+          .replace(/^\w/, (letter) => letter.toUpperCase()) ||
+        'Administrative action',
+      entity:
+        item.userEmail ||
+        item.module ||
+        'District administration',
+    }));
+
+    const notificationItems = notifications.slice(0, 6).map((item) => ({
+      time: formatActivityTime(item.createdAt),
+      action: item.title || 'Notification',
+      entity: item.message || 'District notification',
+    }));
+
+    return [...auditItems, ...notificationItems].slice(0, 6);
   }, [audit, notifications]);
 
   const filteredParcels = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return parcels;
-    return parcels.filter((parcel) => [parcel.surveyNumber, parcel.village, parcel.primaryOwnerName].some((value) => value?.toLowerCase().includes(query)));
+
+    if (!query) {
+      return parcels;
+    }
+
+    return parcels.filter((parcel) =>
+      [
+        parcel.surveyNumber,
+        parcel.village,
+        parcel.primaryOwnerName,
+      ].some((value) =>
+        String(value ?? '')
+          .toLowerCase()
+          .includes(query)
+      )
+    );
   }, [parcels, search]);
 
   const visibleFeatures = useMemo(() => {
+    const features = geoJsonData?.features || [];
     const query = search.trim().toLowerCase();
-    if (!query) return geoJsonData?.features || [];
-    return (geoJsonData?.features || []).filter((feature) => [feature.properties?.surveyNumber, feature.properties?.village, feature.properties?.primaryOwnerName]
-      .some((value) => value?.toLowerCase().includes(query)));
+
+    if (!query) {
+      return features;
+    }
+
+    return features.filter((feature) =>
+      [
+        feature.properties?.surveyNumber,
+        feature.properties?.village,
+        feature.properties?.primaryOwnerName,
+      ].some((value) =>
+        String(value ?? '')
+          .toLowerCase()
+          .includes(query)
+      )
+    );
   }, [geoJsonData, search]);
 
-  const secondaryStats = [
-    ['Parcels Acquired', stats?.awardedParcels || parcels.filter((parcel) => parcel.acquisitionStatus === 'AWARD_PRONOUNCED').length],
-    ['Documents Pending', documents.filter((document) => document.verificationStatus === 'PENDING').length],
-    ['Disputed Parcels', stats?.disputedParcels || parcels.filter((parcel) => parcel.acquisitionStatus === 'DISPUTED').length],
-    ['R&R Pending', rrPackages.filter((item) => item.deliveryStatus !== 'FULLY_DELIVERED').length]
+  const secondaryStats = useMemo(
+    () => [
+      [
+        'Parcels Acquired',
+        stats?.awardedParcels ??
+          parcels.filter(
+            (parcel) =>
+              parcel.acquisitionStatus === 'AWARD_PRONOUNCED'
+          ).length,
+      ],
+      [
+        'Documents Pending',
+        documents.filter(
+          (document) =>
+            document.verificationStatus === 'PENDING'
+        ).length,
+      ],
+      [
+        'Disputed Parcels',
+        stats?.disputedParcels ??
+          parcels.filter(
+            (parcel) =>
+              parcel.acquisitionStatus === 'DISPUTED'
+          ).length,
+      ],
+      [
+        'R&R Pending',
+        rrPackages.filter(
+          (item) =>
+            item.deliveryStatus !== 'FULLY_DELIVERED'
+        ).length,
+      ],
+    ],
+    [documents, parcels, rrPackages, stats]
+  );
+
+  const priorityActions = useMemo(
+    () => [
+      {
+        title: 'Parcel verification required',
+        detail:
+          kpis.pendingVerification > 0
+            ? `${kpis.pendingVerification} parcels awaiting review`
+            : 'No parcels currently awaiting verification',
+        to: '/district/parcels',
+        tone:
+          kpis.pendingVerification > 0
+            ? 'progress'
+            : 'closed',
+      },
+      {
+        title: 'Compensation approval',
+        detail:
+          kpis.compensationPending > 0
+            ? `${kpis.compensationPending} compensation records not yet disbursed`
+            : 'No compensation records currently pending',
+        to: '/district/compensation',
+        tone:
+          kpis.compensationPending > 0
+            ? 'progress'
+            : 'closed',
+      },
+      {
+        title: 'High-risk acquisition',
+        detail:
+          kpis.highRiskCases > 0
+            ? `${kpis.highRiskCases} cases require attention`
+            : 'No high-risk cases currently recorded',
+        to: '/district/projects',
+        tone:
+          kpis.highRiskCases > 0
+            ? 'urgent'
+            : 'closed',
+      },
+    ],
+    [
+      kpis.compensationPending,
+      kpis.highRiskCases,
+      kpis.pendingVerification,
+    ]
+  );
+
+  const parcelColumns = [
+    {
+      title: 'Survey #',
+      key: 'surveyNumber',
+      render: (value) => (
+        <span className="font-mono font-bold text-kobicha">
+          {value || '—'}
+        </span>
+      ),
+    },
+    {
+      title: 'Village',
+      key: 'village',
+      render: (value) => value || '—',
+    },
+    {
+      title: 'Primary Landowner',
+      key: 'primaryOwnerName',
+      render: (value) => (
+        <span className="font-bold text-bistre">
+          {value || '—'}
+        </span>
+      ),
+    },
+    {
+      title: 'Area (Acres)',
+      key: 'areaAcres',
+      render: (value) =>
+        value !== undefined && value !== null
+          ? value
+          : '—',
+    },
+    {
+      title: 'Status',
+      key: 'acquisitionStatus',
+      render: (value) =>
+        value ? (
+          <Badge status={value}>
+            {String(value).replace(/_/g, ' ')}
+          </Badge>
+        ) : (
+          '—'
+        ),
+    },
+    {
+      title: 'Action',
+      key: 'act',
+      render: (_, row) => (
+        <Link to={`/district/parcels/${row.id}`}>
+          <Button
+            size="sm"
+            variant="outline"
+            icon={Eye}
+          >
+            Inspect Plot
+          </Button>
+        </Link>
+      ),
+    },
   ];
 
-  const priorityActions = [
-    { title: 'Parcel verification required', detail: `${kpis.pendingVerification} parcels awaiting review`, to: '/district/valuation' },
-    { title: 'Compensation approval', detail: `${compensation.length || 33} cases in the approval queue`, to: '/district/awards' },
-    { title: 'High-risk acquisition', detail: `${kpis.highRiskCases} cases require immediate action`, to: '/district/tracker' }
-  ];
+  const districtName =
+    user?.jurisdiction?.district || 'District';
 
   return (
-    <div className="district-dashboard">
-      <style>{`
-        .district-dashboard { --terracotta:#B84D28; --umber:#4A2E1B; --ochre:#C07D38; --grey-brown:#6C625B; --paper:#F8F4ED; --line:#DDD3C7; --tan:#E8D9C4; min-height:calc(100vh - 3rem); margin:-1.5rem; padding:2rem clamp(1.25rem,4vw,4rem) 4rem; background:var(--paper); color:var(--umber); }
-        .district-dashboard * { box-sizing:border-box; } .district-dashboard-header,.district-title-row { display:flex; justify-content:space-between; gap:2rem; } .district-dashboard-header { align-items:flex-start; padding-bottom:1.25rem; border-bottom:1px solid var(--line); } .district-overline { color:var(--terracotta); font-size:.7rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase; } .district-brand,.district-context,.district-subtitle,.district-date,.district-kpi-label,.district-kpi-detail,.district-map-footer,.district-section-heading p,.district-action-detail,.district-activity-entity,.district-empty { color:var(--grey-brown); } .district-brand { margin-top:.45rem; font-size:.8rem; } .district-context { display:flex; align-items:center; gap:1.5rem; font-size:.72rem; } .district-context strong,.district-date strong { color:var(--umber); } .district-search { display:flex; align-items:center; gap:.5rem; min-width:12rem; padding:.35rem 0; border-bottom:1px solid var(--grey-brown); } .district-search input { width:100%; border:0; outline:0; background:transparent; color:var(--umber); font:inherit; } .district-search input::placeholder { color:var(--grey-brown); } .district-title-row { align-items:flex-end; padding:2.75rem 0 2rem; } .district-title { margin:0; color:var(--umber); font-size:clamp(2rem,4vw,3.5rem); font-weight:500; letter-spacing:-.03em; line-height:1; } .district-subtitle { margin:.7rem 0 0; font-size:.9rem; } .district-date { text-align:right; font-size:.75rem; line-height:1.6; } .district-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border-top:1px solid var(--line); border-bottom:1px solid var(--line); } .district-kpi { margin-right:1.25rem; padding:1.4rem 1.25rem 1.5rem 0; border-right:1px solid var(--line); } .district-kpi:last-child { margin-right:0; border-right:0; } .district-kpi-label { display:flex; align-items:center; gap:.45rem; font-size:.72rem; } .district-kpi-value { margin-top:.8rem; color:var(--umber); font-size:2rem; font-weight:600; letter-spacing:-.04em; } .district-kpi-detail { margin-top:.25rem; font-size:.72rem; } .status-dot { display:inline-block; width:.48rem; height:.48rem; flex:0 0 .48rem; border-radius:50%; } .status-dot-pending { background:var(--tan); } .status-dot-progress { background:var(--ochre); } .status-dot-urgent { background:var(--terracotta); } .status-dot-closed { background:var(--grey-brown); } .district-more { display:flex; justify-content:flex-end; padding:.8rem 0; border-bottom:1px solid var(--line); } .district-more button,.district-link { border:0; background:transparent; color:var(--terracotta); cursor:pointer; font:inherit; font-size:.75rem; padding:0; } .district-more svg { margin-left:.35rem; vertical-align:middle; transition:transform .2s ease; } .district-more svg.open { transform:rotate(180deg); } .district-secondary { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--line); } .district-secondary div { padding:1rem 1rem 1rem 0; color:var(--grey-brown); font-size:.72rem; border-right:1px solid var(--line); } .district-secondary div:not(:first-child) { padding-left:1rem; } .district-secondary div:last-child { border-right:0; } .district-secondary strong { display:block; margin-bottom:.2rem; color:var(--umber); font-size:1.1rem; } .district-gis-section { padding-top:2.5rem; } .district-section-heading { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; margin-bottom:1rem; } .district-section-heading h2 { margin:0; color:var(--umber); font-size:1rem; font-weight:700; } .district-section-heading p { margin:0; font-size:.72rem; } .district-gis-wrap { padding:.4rem; border:1px solid var(--line); background:#EDE7DD; } .district-gis-wrap > div { border-radius:0 !important; box-shadow:none !important; border-color:var(--line) !important; } .district-map-footer { display:flex; justify-content:space-between; gap:1rem; padding-top:.8rem; font-size:.72rem; } .district-actions-activity { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:3rem; padding-top:2.5rem; } .district-action-list,.district-activity-list { border-top:1px solid var(--line); } .district-action,.district-activity { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 0; border-bottom:1px solid var(--line); } .district-action-title,.district-activity-action { color:var(--umber); font-size:.78rem; font-weight:700; } .district-action-detail,.district-activity-entity { margin-top:.25rem; font-size:.7rem; } .district-action a { color:var(--terracotta); font-size:.72rem; text-decoration:none; white-space:nowrap; } .district-activity { align-items:flex-start; justify-content:flex-start; } .district-activity-time { width:4.5rem; flex:0 0 4.5rem; color:var(--ochre); font-size:.7rem; font-weight:700; } .district-empty { padding:1.2rem 0; font-size:.75rem; } @media (max-width:900px) { .district-kpis { grid-template-columns:repeat(2,1fr); } .district-kpi:nth-child(2) { border-right:0; } .district-kpi:nth-child(n+3) { border-top:1px solid var(--line); } .district-actions-activity { grid-template-columns:1fr; gap:2rem; } } @media (max-width:640px) { .district-dashboard-header,.district-title-row { flex-direction:column; align-items:flex-start; } .district-context { flex-wrap:wrap; gap:.8rem 1rem; } .district-search { min-width:100%; } .district-date { text-align:left; } .district-kpi-value { font-size:1.5rem; } .district-secondary { grid-template-columns:1fr 1fr; } .district-secondary div:nth-child(3),.district-secondary div:nth-child(4) { border-top:1px solid var(--line); } }
-      `}</style>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div>
+          <div className="text-[11px] font-semibold tracking-[0.14em] uppercase text-kobicha mb-1">
+            SIH26016 / District Authority
+          </div>
 
-      <header className="district-dashboard-header"><div><div className="district-overline">SIH26016 / District Authority</div><div className="district-brand">District Administration · Acquisition Console</div></div><div className="district-context"><label className="district-search"><Search size={14} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search parcels" aria-label="Search parcels" /></label><span><strong>{user?.jurisdiction?.district || 'Pune'}</strong> District <ChevronDown size={13} /></span><span>{new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })}</span></div></header>
-      <section className="district-title-row"><div><h1 className="district-title">District Overview</h1><p className="district-subtitle">Land acquisition activity and pending actions across the district.</p></div><div className="district-date"><strong>{user?.name || 'District Collector'}</strong><br />{user?.designation || 'Land Acquisition Authority'}</div></section>
-      <section className="district-kpis" aria-label="District key performance indicators"><Kpi label="Active Projects" value={kpis.activeProjects} detail="+3 this month" tone="progress" /><Kpi label="Parcels Pending Verification" value={kpis.pendingVerification} detail="42 require document review" tone="pending" /><Kpi label="High-Risk Cases" value={kpis.highRiskCases} detail="5 require immediate action" tone="urgent" /><Kpi label="Compensation Pending" value={kpis.compensationPending} detail="Across 33 cases" tone="urgent" /></section>
-      <div className="district-more"><button type="button" onClick={() => setShowMoreStats((current) => !current)} aria-expanded={showMoreStats}>{showMoreStats ? 'Hide more stats' : 'Show more stats'} <ChevronDown size={14} className={showMoreStats ? 'open' : ''} /></button></div>
-      {showMoreStats && <section className="district-secondary" aria-label="Secondary statistics">{secondaryStats.map(([label, value]) => <div key={label}><strong>{value}</strong>{label}</div>)}</section>}
-      <section className="district-gis-section" id="district-gis"><div className="district-section-heading"><div><h2>District GIS Overview</h2><p>Cadastral boundaries and acquisition status across Pune district.</p></div><a className="district-link" href="#district-gis">Open GIS Map <ArrowUpRight size={13} /></a></div><div className="district-gis-wrap"><GISMap features={visibleFeatures} stats={stats} onSelectParcel={setSelectedParcel} height="350px" /></div><div className="district-map-footer"><span>{gisLoading ? 'Loading spatial records…' : `${visibleFeatures.length} parcel boundaries available`}</span><span><StatusDot tone="urgent" /> Disputed &nbsp;&nbsp; <StatusDot tone="progress" /> In progress &nbsp;&nbsp; <StatusDot tone="pending" /> Pending review</span></div></section>
-      <section className="district-actions-activity"><div><div className="district-section-heading"><h2>Priority Actions</h2><p>Requires attention</p></div><div className="district-action-list">{priorityActions.map((item) => <div className="district-action" key={item.title}><div><div className="district-action-title"><StatusDot tone={item.title.includes('High-risk') ? 'urgent' : 'progress'} /><span style={{ marginLeft:'.45rem' }}>{item.title}</span></div><div className="district-action-detail">{item.detail}</div></div><Link to={item.to}>Review <ArrowUpRight size={13} /></Link></div>)}</div></div><div><div className="district-section-heading"><h2>Recent Activity</h2><p>Latest district actions</p></div><div className="district-activity-list">{loading && !activity.length ? <div className="district-empty">Loading recent activity…</div> : (activity.length ? activity : FALLBACK_ACTIVITY).map((item, index) => <div className="district-activity" key={`${item.time}-${index}`}><div className="district-activity-time">{item.time}</div><div><div className="district-activity-action">{item.action}</div><div className="district-activity-entity">{item.entity}</div></div></div>)}</div></div></section>
-      {loading && !filteredParcels.length && <div className="district-empty">Loading district records…</div>}
+          <h2 className="text-xl font-bold text-bistre">
+            District Land Acquisition Authority
+          </h2>
+
+          <p className="text-xs text-text-muted mt-1">
+            Office of District Collector &amp; Competent LAA Authority
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <label className="flex items-center gap-2 px-3 py-2 border border-chamoisee/30 rounded-lg bg-surface text-text-muted">
+            <Search className="w-4 h-4 shrink-0" />
+
+            <input
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              placeholder="Search parcels"
+              aria-label="Search parcels"
+              className="w-full sm:w-48 bg-transparent border-0 outline-none text-xs text-text-primary placeholder:text-text-muted"
+            />
+          </label>
+
+          <div className="text-xs text-text-muted">
+            <span className="font-semibold text-bistre">
+              {districtName}
+            </span>{' '}
+            District
+          </div>
+        </div>
+      </div>
+
+      {/* KPI Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KPICard
+          title="Active Projects"
+          value={loading ? '—' : kpis.activeProjects}
+          subtitle="Projects within district jurisdiction"
+          icon={LandPlot}
+          color="kobicha"
+        />
+
+        <KPICard
+          title="Parcels Pending Verification"
+          value={loading ? '—' : kpis.pendingVerification}
+          subtitle="Field verification not completed"
+          icon={Users}
+          color="warning"
+        />
+
+        <KPICard
+          title="High-Risk Cases"
+          value={loading ? '—' : kpis.highRiskCases}
+          subtitle="Projects or parcels marked high risk"
+          icon={AlertTriangle}
+          color="danger"
+        />
+
+        <KPICard
+          title="Compensation Pending"
+          value={loading ? '—' : kpis.compensationPending}
+          subtitle="Records not yet disbursed"
+          icon={Coins}
+          color="info"
+        />
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() =>
+            setShowMoreStats((current) => !current)
+          }
+          aria-expanded={showMoreStats}
+          className="text-xs font-semibold text-kobicha hover:underline flex items-center gap-1"
+        >
+          {showMoreStats
+            ? 'Hide more stats'
+            : 'Show more stats'}
+
+          <ChevronDown
+            className={`w-3.5 h-3.5 transition-transform ${
+              showMoreStats ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+      </div>
+
+      {showMoreStats && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {secondaryStats.map(([label, value]) => (
+            <div
+              key={label}
+              className="p-4 border border-chamoisee/20 rounded-xl bg-surface"
+            >
+              <p className="text-[10px] uppercase tracking-wide text-text-muted">
+                {label}
+              </p>
+
+              <p className="text-xl font-bold text-bistre mt-1">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Link
+          to="/district/field-officers"
+          className="p-3 bg-surface rounded-xl border border-chamoisee/25 hover:border-kobicha hover:bg-buff/15 transition-all text-center group"
+        >
+          <UserCheck className="w-5 h-5 text-kobicha mx-auto mb-1 group-hover:scale-110 transition-transform" />
+
+          <span className="text-xs font-bold text-bistre block">
+            Field Officers
+          </span>
+
+          <span className="text-[10px] text-text-muted">
+            View surveyors
+          </span>
+        </Link>
+
+        <Link
+          to="/district/documents"
+          className="p-3 bg-surface rounded-xl border border-chamoisee/25 hover:border-kobicha hover:bg-buff/15 transition-all text-center group"
+        >
+          <FileSearch className="w-5 h-5 text-kobicha mx-auto mb-1 group-hover:scale-110 transition-transform" />
+
+          <span className="text-xs font-bold text-bistre block">
+            Verify Documents
+          </span>
+
+          <span className="text-[10px] text-text-muted">
+            Document queue
+          </span>
+        </Link>
+
+        <Link
+          to="/district/compensation"
+          className="p-3 bg-surface rounded-xl border border-chamoisee/25 hover:border-kobicha hover:bg-buff/15 transition-all text-center group"
+        >
+          <Coins className="w-5 h-5 text-kobicha mx-auto mb-1 group-hover:scale-110 transition-transform" />
+
+          <span className="text-xs font-bold text-bistre block">
+            Compensation
+          </span>
+
+          <span className="text-[10px] text-text-muted">
+            Awards &amp; disbursement
+          </span>
+        </Link>
+
+        <Link
+          to="/district/rr"
+          className="p-3 bg-surface rounded-xl border border-chamoisee/25 hover:border-kobicha hover:bg-buff/15 transition-all text-center group"
+        >
+          <Scale className="w-5 h-5 text-kobicha mx-auto mb-1 group-hover:scale-110 transition-transform" />
+
+          <span className="text-xs font-bold text-bistre block">
+            R&amp;R
+          </span>
+
+          <span className="text-[10px] text-text-muted">
+            Rehabilitation &amp; resettlement
+          </span>
+        </Link>
+      </div>
+
+      {/* GIS */}
+      <Card
+        title="District Cadastral Spatial Viewer"
+        subtitle="Cadastral boundaries and acquisition status across the district"
+        action={
+          <Link to="/district/gis">
+            <Button
+              size="sm"
+              variant="outline"
+              icon={ArrowRight}
+            >
+              Full GIS View
+            </Button>
+          </Link>
+        }
+      >
+        <GISMap
+          features={visibleFeatures}
+          stats={stats}
+          onSelectParcel={setSelectedParcel}
+          height="380px"
+        />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-3 text-xs text-text-muted">
+          <span>
+            {gisLoading
+              ? 'Loading spatial records…'
+              : `${visibleFeatures.length} parcel boundaries available`}
+          </span>
+
+          <span className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <StatusDot tone="urgent" />
+              Disputed
+            </span>
+
+            <span className="flex items-center gap-1">
+              <StatusDot tone="progress" />
+              In progress
+            </span>
+
+            <span className="flex items-center gap-1">
+              <StatusDot tone="pending" />
+              Pending review
+            </span>
+          </span>
+        </div>
+      </Card>
+
+      {/* Parcels + Delay Radar */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card
+            title="Land Parcels Queue"
+            subtitle="Review ownership, acquisition status and ground survey records"
+            action={
+              <Link to="/district/parcels">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  icon={ArrowRight}
+                >
+                  View All
+                </Button>
+              </Link>
+            }
+          >
+            {loading ? (
+              <div className="py-10 text-center text-xs text-text-muted">
+                Loading district parcel records…
+              </div>
+            ) : filteredParcels.length === 0 ? (
+              <div className="py-10 text-center text-xs text-text-muted">
+                No parcel records found.
+              </div>
+            ) : (
+              <Table
+                columns={parcelColumns}
+                data={filteredParcels}
+                onRowClick={(row) =>
+                  setSelectedParcel(row)
+                }
+              />
+            )}
+          </Card>
+        </div>
+
+        <div>
+          <DelayRadar />
+        </div>
+      </div>
+
+      {/* Priority Actions + Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card
+          title="Priority Actions"
+          subtitle="Current items requiring district attention"
+        >
+          <div className="divide-y divide-chamoisee/15">
+            {priorityActions.map((item) => (
+              <div
+                key={item.title}
+                className="py-4 flex items-center justify-between gap-4"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <StatusDot tone={item.tone} />
+
+                    <span className="text-xs font-bold text-bistre">
+                      {item.title}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-text-muted mt-1">
+                    {item.detail}
+                  </p>
+                </div>
+
+                <Link
+                  to={item.to}
+                  className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-kobicha hover:underline"
+                >
+                  Review
+                  <ArrowUpRight className="w-3 h-3" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card
+          title="Recent Activity"
+          subtitle="Latest recorded district actions"
+        >
+          {loading && activity.length === 0 ? (
+            <div className="py-10 text-center text-xs text-text-muted">
+              Loading recent activity…
+            </div>
+          ) : activity.length === 0 ? (
+            <div className="py-10 text-center text-xs text-text-muted">
+              No recent activity recorded.
+            </div>
+          ) : (
+            <div className="divide-y divide-chamoisee/15">
+              {activity.map((item, index) => (
+                <div
+                  className="py-3.5 flex items-start gap-3"
+                  key={`${item.time}-${index}`}
+                >
+                  <span className="w-14 shrink-0 text-[10px] font-semibold text-kobicha">
+                    {item.time}
+                  </span>
+
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-bistre">
+                      {item.action}
+                    </p>
+
+                    <p className="text-[11px] text-text-muted mt-0.5 line-clamp-2">
+                      {item.entity}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      </div>
     </div>
   );
 };

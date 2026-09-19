@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MapContainer, TileLayer, Polygon, Popup, Tooltip } from 'react-leaflet';
 import GISLegend from './GISLegend';
 import { Badge } from '../ui/Badge';
-import { CheckCircle, AlertOctagon, User, LandPlot, MapPin } from 'lucide-react';
+import { User, LandPlot, MapPin, AlertOctagon } from 'lucide-react';
 
 export const GISMap = ({
   features = [],
   selectedParcel,
   onSelectParcel,
-  mode = 'monitor', // 'monitor' | 'survey' | 'valuation' | 'citizen'
   center = [18.5775, 73.9835], // Wagholi, Pune coordinates
   zoom = 15,
   height = '480px',
@@ -20,19 +19,19 @@ export const GISMap = ({
     const isVerified = feature.properties?.isVerified;
 
     if (isDisputed) {
-      return { fillColor: '#EF4444', color: '#DC2626', weight: 2.5, fillOpacity: 0.5 };
+      return { fillColor: '#A24A3F', color: '#7E332A', weight: 2.5, fillOpacity: 0.5 };
     }
     if (status === 'AWARD_PRONOUNCED') {
-      return { fillColor: '#F59E0B', color: '#D97706', weight: 2, fillOpacity: 0.45 };
+      return { fillColor: '#C99A3F', color: '#8F6A22', weight: 2, fillOpacity: 0.45 };
     }
     if (isVerified || status === 'VALUATION_COMPLETED') {
-      return { fillColor: '#10B981', color: '#059669', weight: 2, fillOpacity: 0.45 };
+      return { fillColor: '#6B7B4C', color: '#4D5A34', weight: 2, fillOpacity: 0.45 };
     }
-    return { fillColor: '#38BDF8', color: '#0284C7', weight: 2, fillOpacity: 0.4 };
+    return { fillColor: '#5B7A8C', color: '#3D5665', weight: 2, fillOpacity: 0.4 };
   };
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-slate-800 shadow-xl" style={{ height }}>
+    <div className="relative rounded-xl overflow-hidden border border-chamoisee/25 shadow-card bg-surface" style={{ height }}>
       <MapContainer
         center={center}
         zoom={zoom}
@@ -46,7 +45,6 @@ export const GISMap = ({
 
         {features.map((feat) => {
           if (!feat.geometry?.coordinates) return null;
-          // Leaflet expects [lat, lng], whereas GeoJSON is [lng, lat]
           const latLngs = feat.geometry.coordinates[0].map(([lng, lat]) => [lat, lng]);
 
           return (
@@ -59,34 +57,34 @@ export const GISMap = ({
               }}
             >
               <Tooltip sticky>
-                <div className="text-xs font-semibold">
+                <div className="text-xs font-bold text-bistre">
                   Survey #{feat.properties?.surveyNumber} - {feat.properties?.village}
                 </div>
               </Tooltip>
               <Popup className="custom-popup">
-                <div className="p-1 space-y-1.5 text-xs text-slate-900">
-                  <div className="flex items-center justify-between gap-2 border-b pb-1">
-                    <span className="font-bold text-sm">Survey #{feat.properties?.surveyNumber}</span>
-                    <span className="text-[10px] bg-slate-200 px-1.5 py-0.5 rounded font-medium">
+                <div className="p-1 space-y-1.5 text-xs text-text-primary">
+                  <div className="flex items-center justify-between gap-2 border-b border-chamoisee/20 pb-1">
+                    <span className="font-bold text-sm text-bistre">Survey #{feat.properties?.surveyNumber}</span>
+                    <span className="text-[10px] bg-buff/30 text-bistre px-1.5 py-0.5 rounded font-bold">
                       {feat.properties?.village}
                     </span>
                   </div>
                   <div className="space-y-1">
                     <p className="flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-slate-500" />
+                      <User className="w-3.5 h-3.5 text-chamoisee" />
                       <strong>Owner:</strong> {feat.properties?.primaryOwnerName}
                     </p>
                     <p className="flex items-center gap-1.5">
-                      <LandPlot className="w-3.5 h-3.5 text-slate-500" />
+                      <LandPlot className="w-3.5 h-3.5 text-chamoisee" />
                       <strong>Area:</strong> {feat.properties?.areaAcres} Acres ({feat.properties?.landType})
                     </p>
                     <p className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                      <strong>Status:</strong> {feat.properties?.acquisitionStatus}
+                      <MapPin className="w-3.5 h-3.5 text-chamoisee" />
+                      <strong>Status:</strong> <Badge size="sm" status={feat.properties?.acquisitionStatus} />
                     </p>
                   </div>
                   {feat.properties?.discrepancyDetected && (
-                    <div className="mt-1 bg-red-50 text-red-700 p-1.5 rounded text-[11px] font-medium flex items-center gap-1">
+                    <div className="mt-1 bg-status-danger/15 text-[#7E332A] p-1.5 rounded text-[11px] font-bold flex items-center gap-1">
                       <AlertOctagon className="w-3.5 h-3.5" /> Discrepancy Flagged
                     </div>
                   )}
