@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { NotificationContext } from '../../context/NotificationContext';
 import { Bell, CheckCheck, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 
-export const NotificationBell = () => {
+export const NotificationBell = ({ onOpen, citizen = false }) => {
   const { notifications, unreadCount, markAsRead, markAllRead } = useContext(NotificationContext);
   const [open, setOpen] = useState(false);
 
@@ -22,8 +22,8 @@ export const NotificationBell = () => {
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white transition-colors"
+        onClick={() => onOpen ? onOpen() : setOpen(!open)}
+        className={`relative p-2 transition-colors ${citizen ? 'citizen-notification-button' : 'rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white'}`}
       >
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (

@@ -20,7 +20,9 @@ import {
   HelpCircle,
   TrendingUp,
   RefreshCw,
-  LandPlot
+  LandPlot,
+  Bell,
+  UserCircle
 } from 'lucide-react';
 
 export const RoleSidebar = () => {
@@ -61,24 +63,30 @@ export const RoleSidebar = () => {
       { label: 'Offline Sync Queue', to: '/field/sync', icon: RefreshCw }
     ],
     [ROLES.CITIZEN]: [
-      { label: 'Citizen Portal Home', to: '/citizen', icon: LayoutDashboard, exact: true },
-      { label: 'My Land Claim Status', to: '/citizen/claim-status', icon: LandPlot },
-      { label: 'Compensation & Solatium', to: '/citizen/compensation', icon: Coins },
-      { label: 'R&R Benefits Package', to: '/citizen/rr-benefits', icon: Building2 },
-      { label: 'Grievance Redressal', to: '/citizen/grievances', icon: HelpCircle }
+      { label: 'Home', to: '/citizen', icon: LayoutDashboard, exact: true },
+      { label: 'My Land', to: '/citizen/my-land', icon: LandPlot },
+      { label: 'Acquisition Status', to: '/citizen/acquisition-status', icon: FileCheck2 },
+      { label: 'Compensation', to: '/citizen/compensation', icon: Coins },
+      { label: 'R&R', to: '/citizen/rr', icon: Building2 },
+      { label: 'Documents', to: '/citizen/documents', icon: FileText },
+      { label: 'Grievances', to: '/citizen/grievances', icon: HelpCircle },
+      { label: 'Notifications', to: '/citizen/notifications', icon: Bell },
+      { label: 'Profile', to: '/citizen/profile', icon: UserCircle }
     ]
   };
 
   const navItems = roleNavItems[role] || roleNavItems[ROLES.CENTRAL_ADMIN];
 
+  const isCitizen = role === ROLES.CITIZEN;
+
   return (
-    <aside className="w-64 flex-shrink-0 min-h-[calc(100vh-57px)] bg-slate-950 border-r border-slate-800 p-4 flex flex-col justify-between">
+    <aside className={isCitizen ? 'citizen-sidebar' : 'w-64 flex-shrink-0 min-h-[calc(100vh-57px)] bg-slate-950 border-r border-slate-800 p-4 flex flex-col justify-between'}>
       <div>
-        <div className="px-3 py-2 mb-3">
-          <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Navigation Menu</p>
-          <p className="text-xs font-medium text-slate-300 capitalize">{role?.toLowerCase().replace('_', ' ')} Workspace</p>
+        <div className={isCitizen ? 'citizen-sidebar-heading' : 'px-3 py-2 mb-3'}>
+          <p className={isCitizen ? '' : 'text-[11px] font-semibold tracking-wider text-slate-500 uppercase'}>{isCitizen ? 'NLAMS' : 'Navigation Menu'}</p>
+          <p className={isCitizen ? '' : 'text-xs font-medium text-slate-300 capitalize'}>{isCitizen ? 'Citizen Portal' : `${role?.toLowerCase().replace('_', ' ')} Workspace`}</p>
         </div>
-        <nav className="space-y-1">
+        <nav className={isCitizen ? 'citizen-sidebar-nav' : 'space-y-1'}>
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -86,8 +94,9 @@ export const RoleSidebar = () => {
                 key={item.to}
                 to={item.to}
                 end={item.exact}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                className={({ isActive }) => isCitizen
+                  ? `citizen-nav-link ${isActive ? 'is-active' : ''}`
+                  : `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                     isActive
                       ? 'bg-sky-600/15 text-sky-400 border border-sky-500/20 shadow-sm font-semibold'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
@@ -103,13 +112,13 @@ export const RoleSidebar = () => {
       </div>
 
       {/* Jurisdiction Footer info */}
-      <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs">
-        <p className="text-[10px] uppercase font-semibold text-slate-500">Jurisdiction Active</p>
-        <p className="font-semibold text-slate-200 mt-0.5">
+      <div className={isCitizen ? 'citizen-sidebar-footer' : 'p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 text-xs'}>
+        <p className={isCitizen ? 'citizen-footer-label' : 'text-[10px] uppercase font-semibold text-slate-500'}>Jurisdiction Active</p>
+        <p className={isCitizen ? 'citizen-footer-value' : 'font-semibold text-slate-200 mt-0.5'}>
           {user?.jurisdiction?.state || 'National (All India)'}
         </p>
         {user?.jurisdiction?.district && (
-          <p className="text-[11px] text-slate-400">{user.jurisdiction.district} District</p>
+          <p className={isCitizen ? 'citizen-footer-detail' : 'text-[11px] text-slate-400'}>{user.jurisdiction.district} District</p>
         )}
       </div>
     </aside>

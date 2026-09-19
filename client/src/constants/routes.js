@@ -39,9 +39,16 @@ export const APP_ROUTES = {
   },
   CITIZEN: {
     DASHBOARD: '/citizen',
+    HOME: '/citizen/home',
+    MY_LAND: '/citizen/my-land',
     CLAIM_STATUS: '/citizen/claim-status',
+    ACQUISITION_STATUS: '/citizen/acquisition-status',
     COMPENSATION: '/citizen/compensation',
+    RR: '/citizen/rr',
     RR_BENEFITS: '/citizen/rr-benefits',
-    GRIEVANCES: '/citizen/grievances'
+    DOCUMENTS: '/citizen/documents',
+    GRIEVANCES: '/citizen/grievances',
+    NOTIFICATIONS: '/citizen/notifications',
+    PROFILE: '/citizen/profile'
   }
 };
