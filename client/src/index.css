@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -50,3 +52,139 @@
   border-radius: 0.75rem;
   z-index: 10;
 }
+
+/* Citizen prototype theme: scoped so the existing role dashboards keep their current UI. */
+.citizen-theme { background: #fff8f5; color: #211a15; }
+.citizen-navbar { height: 72px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; background: #fff8f5; border-bottom: 1px solid #eaded7; }
+.citizen-brand-mark { width: 36px; height: 36px; border: 1px solid #b84d28; display: flex; align-items: center; justify-content: center; }
+.citizen-brand-inner { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: #b84d28; color: #fff; }
+.citizen-brand-title { color: #211a15; font-size: 16px; font-weight: 700; }
+.citizen-brand-tag { color: #b84d28; border: 1px solid #e3b19e; padding: 3px 6px; font-size: 10px; font-weight: 600; }
+.citizen-brand-subtitle { color: #795741; font-size: 11px; line-height: 1.2; }
+.citizen-theme, .citizen-navbar { font-family: Inter, sans-serif; }
+.citizen-notification-button { position: relative; color: #fff; background: #211a15; border: 1px solid #211a15; width: 36px; height: 36px; display: grid; place-items: center; }
+.citizen-notification-button:hover { background: #b84d28; border-color: #b84d28; color: #fff; }
+.citizen-notification-button .animate-pulse { background: #b84d28; }
+.citizen-user-controls { border-left: 1px solid #eaded7; }
+.citizen-user-name { color: #211a15; font-size: 12px; font-weight: 600; }
+.citizen-user-role { color: #795741; font-size: 11px; }
+.citizen-sidebar { width: 260px; flex-shrink: 0; min-height: calc(100vh - 72px); padding: 32px 20px 24px; background: #fff; border-right: 1px solid #eaded7; display: flex; flex-direction: column; justify-content: space-between; }
+.citizen-sidebar-heading { padding: 0 12px 28px; color: #211a15; }
+.citizen-sidebar-heading p:first-child { font-size: 18px; font-weight: 700; }
+.citizen-sidebar-heading p:last-child { margin-top: 4px; color: #795741; font-size: 12px; }
+.citizen-sidebar-nav { display: grid; gap: 5px; }
+.citizen-nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 12px; color: #795741; font-size: 13px; font-weight: 500; border-left: 2px solid transparent; transition: .15s ease; }
+.citizen-nav-link:hover, .citizen-nav-link.is-active { color: #b84d28; background: #fff3ed; border-left-color: #b84d28; }
+.citizen-sidebar-footer { padding: 16px 12px; color: #795741; font-size: 12px; border-top: 1px solid #eaded7; }
+.citizen-footer-label { color: #795741; font-size: 10px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; }
+.citizen-footer-value { margin-top: 4px; color: #211a15; font-weight: 600; }
+.citizen-footer-detail { color: #795741; font-size: 11px; }
+.citizen-role-badge { padding: 4px 8px; color: #b84d28; background: #fff0e9; border: 1px solid #e3b19e; border-radius: 2px; font-size: 10px; font-weight: 600; }
+.citizen-logout-button { padding: 6px; color: #795741; background: transparent; border: 0; cursor: pointer; }
+.citizen-logout-button:hover { color: #b84d28; }
+.citizen-main { flex: 1; overflow-y: auto; padding: 64px 40px; background: #fff8f5; }
+.citizen-content { max-width: 1520px; margin: 0 auto; }
+.citizen-page { display: grid; gap: 40px; }
+.citizen-page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 16px; border-bottom: 1px solid #eaded7; }
+.citizen-page-header h1 { color: #211a15; font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.6px; }
+.citizen-page-header p, .citizen-section-subtitle { color: #795741; font-size: 14px; line-height: 22px; }
+.citizen-context-pill { padding: 8px 16px; color: #795741; background: #fff; border: 1px solid #f0e5df; box-shadow: 0 1px 1px rgba(0,0,0,.05); border-radius: 2px; font-size: 12px; font-weight: 500; }
+.citizen-card { background: #fff; border: 1px solid #f0e5df; border-radius: 2px; box-shadow: 0 1px 1px rgba(0,0,0,.05); }
+.citizen-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 24px 24px 0; }
+.citizen-card-body { padding: 24px; }
+.citizen-section-title { color: #211a15; font-size: 20px; line-height: 28px; font-weight: 600; }
+.citizen-section-subtitle { margin-top: 3px; }
+.citizen-two-column { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(480px, 1.2fr); gap: 24px; }
+.citizen-detail-list, .citizen-info-row { display: grid; gap: 16px; }
+.citizen-detail-list > div, .citizen-info-row { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0e5df; color: #795741; font-size: 13px; }
+.citizen-detail-list strong, .citizen-info-row strong { display: inline-flex; align-items: center; gap: 6px; text-align: right; color: #211a15; font-weight: 600; }
+.citizen-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 2px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.citizen-button-primary { margin-top: 24px; color: #fff; background: #b84d28; }
+.citizen-button-outline { color: #b84d28; background: #fff; border: 1px solid #d98b70; }
+.citizen-button-small { padding: 7px 10px; font-size: 12px; }
+.citizen-status { display: inline-flex; width: fit-content; padding: 4px 8px; border-radius: 2px; font-size: 11px; font-weight: 600; }
+.citizen-status-completed, .citizen-status-verified, .citizen-status-paid, .citizen-status-available { color: #287052; background: #e9f5ee; }
+.citizen-status-in-progress, .citizen-status-processing, .citizen-status-under-review, .citizen-status-action-required { color: #b84d28; background: #fff0e9; }
+.citizen-status-pending, .citizen-status-requested { color: #795741; background: #f5eee9; }
+.citizen-map-label { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: #795741; font-size: 13px; }
+.citizen-map-label + .relative { border-color: #eaded7; border-radius: 2px; }
+.citizen-alert { display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: #287052; background: #e9f5ee; border: 1px solid #c4e5d1; font-size: 13px; }
+.citizen-document-list, .citizen-notification-list { display: grid; }
+.citizen-document-row { display: grid; grid-template-columns: 1.3fr auto 1fr; align-items: center; gap: 20px; padding: 17px 0; border-bottom: 1px solid #f0e5df; }
+.citizen-document-row > div:first-child, .citizen-notification-copy { display: grid; gap: 4px; }
+.citizen-document-row strong, .citizen-notification-copy strong { color: #211a15; font-size: 14px; }
+.citizen-document-row span, .citizen-notification-copy span, .citizen-notification-copy small { color: #795741; font-size: 12px; }
+.citizen-row-actions { display: flex; justify-content: flex-end; gap: 5px; }
+.citizen-notification-row { display: flex; align-items: flex-start; gap: 14px; padding: 18px 0; text-align: left; border: 0; border-bottom: 1px solid #f0e5df; background: transparent; cursor: pointer; }
+.citizen-notification-row.is-unread { background: #fff8f5; }
+.citizen-notification-icon { display: grid; place-items: center; width: 32px; height: 32px; color: #b84d28; background: #fff0e9; }
+.citizen-notification-copy { flex: 1; }
+.citizen-unread-dot { color: #b84d28; margin-top: 5px; }
+.citizen-profile-grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 24px; }
+.citizen-profile-summary { text-align: center; }
+.citizen-avatar { width: 64px; height: 64px; margin: 0 auto 14px; display: grid; place-items: center; color: #b84d28; background: #fff0e9; }
+.citizen-profile-summary h2 { color: #211a15; font-size: 20px; font-weight: 600; }
+.citizen-profile-summary p, .citizen-role-label { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 7px; color: #795741; font-size: 13px; }
+.citizen-role-label { color: #b84d28; font-weight: 600; }
+.citizen-info-row strong svg { margin-right: 5px; }
+.citizen-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.citizen-kpi-grid .citizen-card { min-height: 144px; padding: 24px; }
+.citizen-kpi-grid .citizen-card-body { padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.citizen-kpi-label { color: #795741; font-size: 12px; font-weight: 600; letter-spacing: .6px; }
+.citizen-kpi-value { color: #211a15; font-size: 32px; line-height: 32px; font-weight: 600; letter-spacing: -.8px; }
+.citizen-kpi-value-small { font-size: 23px; letter-spacing: -.3px; }
+.citizen-kpi-grid span { color: #795741; font-size: 13px; line-height: 20px; }
+.citizen-inline-link { display: inline-flex; align-items: center; gap: 5px; color: #b84d28; font-size: 13px; font-weight: 600; }
+.citizen-timeline-horizontal { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.citizen-timeline-item { display: grid; gap: 8px; align-content: start; min-width: 0; color: #795741; font-size: 12px; }
+.citizen-timeline-marker { width: 24px; height: 24px; display: grid; place-items: center; color: #fff; background: #d9c7bd; border-radius: 50%; }
+.citizen-timeline-item.is-complete .citizen-timeline-marker { background: #287052; }
+.citizen-timeline-item.is-current .citizen-timeline-marker { background: #b84d28; }
+.citizen-timeline-item.is-current strong { color: #b84d28; }
+.citizen-timeline-item strong { color: #211a15; font-size: 13px; }
+.citizen-home-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.citizen-home-links > * { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 16px; color: #b84d28; background: #fff; border: 1px solid #f0e5df; border-radius: 2px; }
+.citizen-home-links span:not(.citizen-location) { display: grid; flex: 1; gap: 3px; }
+.citizen-home-links strong { color: #211a15; font-size: 13px; }
+.citizen-home-links small { color: #795741; font-size: 11px; }
+.citizen-location { color: #795741 !important; font-size: 12px; }
+.citizen-case-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #eaded7; border: 1px solid #eaded7; }
+.citizen-case-summary > div { display: grid; gap: 7px; padding: 20px 24px; background: #fff; }
+.citizen-case-summary span, .citizen-payment-status span { color: #795741; font-size: 12px; }
+.citizen-case-summary strong, .citizen-payment-status strong { color: #211a15; font-size: 16px; font-weight: 600; }
+.citizen-full-timeline { display: grid; gap: 0; }
+.citizen-full-timeline-row { display: grid; grid-template-columns: 22px 1fr; gap: 16px; min-height: 108px; position: relative; }
+.citizen-full-timeline-row:not(:last-child)::before { content: ''; position: absolute; left: 10px; top: 22px; bottom: 0; width: 1px; background: #e1d1c8; }
+.citizen-full-marker { width: 20px; height: 20px; margin-top: 2px; z-index: 1; border: 4px solid #d9c7bd; background: #fff; border-radius: 50%; }
+.citizen-full-timeline-row.is-current .citizen-full-marker { border-color: #b84d28; }
+.citizen-timeline-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.citizen-timeline-heading strong { color: #211a15; font-size: 15px; }
+.citizen-full-timeline-row p { margin-top: 5px; color: #795741; font-size: 13px; }
+.citizen-full-timeline-row small { display: block; margin-top: 8px; color: #a08777; font-size: 12px; }
+.citizen-payment-status { display: flex; gap: 80px; }
+.citizen-payment-status > div { display: grid; gap: 6px; }
+.citizen-payment-list { display: grid; }
+.citizen-payment-list > div { display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid #f0e5df; color: #795741; font-size: 13px; }
+.citizen-payment-list strong { color: #211a15; }
+.citizen-benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.citizen-benefit { display: flex; gap: 10px; padding: 16px; background: #fff8f5; color: #287052; border: 1px solid #f0e5df; }
+.citizen-benefit strong { color: #211a15; font-size: 13px; }
+.citizen-benefit p { margin-top: 5px; color: #795741; font-size: 12px; line-height: 18px; }
+.citizen-action-card .citizen-card-header { align-items: center; }
+.citizen-action-card .citizen-button-primary { margin-top: 0; }
+.citizen-form { display: grid; gap: 18px; max-width: 720px; }
+.citizen-form label { display: grid; gap: 7px; color: #211a15; font-size: 13px; font-weight: 600; }
+.citizen-form select, .citizen-form textarea { width: 100%; padding: 11px 12px; color: #211a15; background: #fff; border: 1px solid #d9c7bd; border-radius: 2px; font: inherit; font-weight: 400; }
+.citizen-file-label { display: flex !important; align-items: center; width: fit-content; padding: 10px 14px; color: #b84d28 !important; border: 1px solid #d98b70; cursor: pointer; }
+.citizen-file-label input { display: none; }
+.citizen-file-label small { color: #795741; font-weight: 400; }
+.citizen-grievance-description { color: #795741; font-size: 13px; }
+.citizen-grievance-timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 24px; }
+.citizen-grievance-timeline > div { display: grid; gap: 7px; color: #a08777; font-size: 12px; }
+.citizen-grievance-timeline span { width: 12px; height: 12px; background: #d9c7bd; border-radius: 50%; }
+.citizen-grievance-timeline .is-complete, .citizen-grievance-timeline .is-current { color: #287052; }
+.citizen-grievance-timeline .is-complete span { background: #287052; }
+.citizen-grievance-timeline .is-current { color: #b84d28; }
+.citizen-grievance-timeline .is-current span { background: #b84d28; }
+@media (max-width: 1100px) { .citizen-kpi-grid, .citizen-home-links { grid-template-columns: repeat(2, 1fr); } .citizen-benefits-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .citizen-main { padding: 40px 24px; } .citizen-two-column, .citizen-profile-grid { grid-template-columns: 1fr; } .citizen-document-row { grid-template-columns: 1fr; gap: 10px; } .citizen-row-actions { justify-content: flex-start; } }

@@ -1,100 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { KPICard } from '../../components/ui/KPICard';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Button';
-import { GISMap } from '../../components/gis/GISMap';
-import { useGIS } from '../../hooks/useGIS';
-import { LandPlot, Coins, Building2, HelpCircle, ArrowRight, ShieldCheck, FileText } from 'lucide-react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import apiClient from '../../services/api/apiClient';
+import { ArrowRight, CheckCircle2, Coins, Home, LandPlot, MapPin } from 'lucide-react';
+import { GISMap } from '../../components/gis/GISMap';
+import { CitizenCard, CitizenPageHeader, CitizenStatus } from '../../components/citizen/CitizenCard';
+import { acquisitionTimeline, citizenGeoJson, citizenParcel, citizenProfile, compensationData, rrData, citizenProject, formatINR } from '../../data/citizenMockData';
 
-export const CitizenDashboard = () => {
-  const { geoJsonData, stats } = useGIS();
+const stageClass = (status) => status === 'Completed' ? 'is-complete' : status === 'In Progress' ? 'is-current' : '';
 
-  const citizenLand = {
-    surveyNumber: '142/1A',
-    village: 'Wagholi',
-    taluka: 'Haveli',
-    district: 'Pune',
-    areaAcres: 2.5,
-    areaHectares: 1.01,
-    project: 'Pune-Bengaluru Green Expressway (Package 4A)',
-    status: 'VALUATION_COMPLETED',
-    totalAwardINR: 29366506
-  };
-
-  const formatINR = (val) =>
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val || 0);
-
-  return (
-    <div className="space-y-6">
-      {/* Greeting Header */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-sky-900/40 via-slate-900 to-slate-950 border border-sky-500/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-semibold text-sky-400 uppercase tracking-wider">Citizen & Landowner Portal</span>
-          <h2 className="text-2xl font-bold text-white mt-1">Welcome, Shri Ramesh Tukaram Patil</h2>
-          <p className="text-xs text-slate-300 mt-1">
-            Registered Title Holder for <strong>Survey #142/1A</strong>, Wagholi Village (Haveli, Pune)
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link to="/citizen/grievances">
-            <Button variant="secondary" icon={HelpCircle}>File Dispute / Grievance</Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* KPI Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard title="Acquired Parcel" value="2.5 Acres" subtitle="Survey #142/1A (Agricultural)" icon={LandPlot} color="sky" />
-        <KPICard title="Statutory Award (Sec 23)" value={formatINR(citizenLand.totalAwardINR)} subtitle="Includes 100% Solatium" icon={Coins} color="emerald" />
-        <KPICard title="Direct DBT Status" value="Award Sanctioned" subtitle="Escrow Account Funded" icon={ShieldCheck} color="purple" />
-        <KPICard title="Dispute Redressal" value="1 Scheduled" subtitle="Hearing on 25-Sep with Collector" icon={HelpCircle} color="amber" />
-      </div>
-
-      {/* Map of Citizen's Parcel */}
-      <Card title="My Cadastral Land Parcel Boundaries" subtitle="High-precision satellite GIS overlay for Survey #142/1A">
-        <GISMap features={geoJsonData?.features || []} stats={stats} height="360px" />
-      </Card>
-
-      {/* Quick Access Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card title="Land Acquisition Claim" subtitle="Current statutory status">
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Your parcel is notified under <strong>Section 19 Declaration</strong>. Valuation award pronounced by LAA Collector.
-          </p>
-          <Link to="/citizen/claim-status" className="mt-4 block">
-            <Button variant="outline" size="sm" icon={ArrowRight} className="w-full">
-              View Section Timeline
-            </Button>
-          </Link>
-        </Card>
-
-        <Card title="Compensation & Solatium" subtitle="Statutory Schedule I breakdown">
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Market rate multiplied by 1.5x rural factor plus <strong>100% Solatium</strong> & 12% statutory interest.
-          </p>
-          <Link to="/citizen/compensation" className="mt-4 block">
-            <Button variant="primary" size="sm" icon={Coins} className="w-full">
-              View Detailed Calculation
-            </Button>
-          </Link>
-        </Card>
-
-        <Card title="R&R Benefits (Schedule II)" subtitle="Rehabilitation entitlements">
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Check your family's eligibility for subsistence allowance, housing plots, and skill development aid.
-          </p>
-          <Link to="/citizen/rr-benefits" className="mt-4 block">
-            <Button variant="secondary" size="sm" icon={Building2} className="w-full">
-              Check R&R Entitlements
-            </Button>
-          </Link>
-        </Card>
-      </div>
+export const CitizenDashboard = () => (
+  <div className="citizen-page">
+    <CitizenPageHeader title={`Welcome back, ${citizenProfile.name.split(' ')[0]}`} subtitle="Track your land acquisition case, compensation and rehabilitation status."><span className="citizen-context-pill">{citizenParcel.village} • Parcel {citizenParcel.parcelNumber}</span></CitizenPageHeader>
+    <div className="citizen-kpi-grid">
+      <CitizenCard><p className="citizen-kpi-label">LAND PARCEL</p><strong className="citizen-kpi-value">{citizenParcel.parcelNumber}</strong><span>{citizenParcel.village}</span></CitizenCard>
+      <CitizenCard><p className="citizen-kpi-label">ACQUISITION PROGRESS</p><strong className="citizen-kpi-value">67%</strong><span>4 of 6 stages completed</span></CitizenCard>
+      <CitizenCard><p className="citizen-kpi-label">COMPENSATION</p><strong className="citizen-kpi-value">{formatINR(compensationData.paid)}</strong><span>Paid • {formatINR(compensationData.processing)} processing</span></CitizenCard>
+      <CitizenCard><p className="citizen-kpi-label">R&amp;R STATUS</p><strong className="citizen-kpi-value citizen-kpi-value-small">{rrData.status}</strong><span>Review pending</span></CitizenCard>
     </div>
-  );
-};
-
+    <CitizenCard title="Acquisition Status" subtitle="Current progress of your land acquisition case." action={<Link className="citizen-inline-link" to="/citizen/acquisition-status">View details <ArrowRight size={15} /></Link>}>
+      <div className="citizen-timeline citizen-timeline-horizontal">{acquisitionTimeline.map((stage) => <div className={`citizen-timeline-item ${stageClass(stage.status)}`} key={stage.id}><span className="citizen-timeline-marker">{stage.status === 'Completed' ? <CheckCircle2 size={14} /> : stage.status === 'In Progress' ? <span /> : null}</span><strong>{stage.title}</strong><CitizenStatus status={stage.status} /></div>)}</div>
+    </CitizenCard>
+    <CitizenCard title="Your Land" subtitle="Authorized parcel location and acquisition boundary."><GISMap features={citizenGeoJson.features} height="380px" mode="citizen" /></CitizenCard>
+    <div className="citizen-home-links">
+      <Link to="/citizen/my-land"><LandPlot size={18} /><span><strong>My Land</strong><small>{citizenParcel.area} • {citizenProject.name}</small></span><ArrowRight size={16} /></Link>
+      <Link to="/citizen/compensation"><Coins size={18} /><span><strong>Compensation</strong><small>{formatINR(compensationData.totalAssessed)} assessed • {compensationData.status}</small></span><ArrowRight size={16} /></Link>
+      <Link to="/citizen/rr"><Home size={18} /><span><strong>R&amp;R Package</strong><small>{rrData.eligibility} • {rrData.status}</small></span><ArrowRight size={16} /></Link>
+      <span className="citizen-location"><MapPin size={18} /> {citizenProject.location}</span>
+    </div>
+  </div>
+);
 export default CitizenDashboard;

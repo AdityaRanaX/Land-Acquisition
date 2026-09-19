@@ -47,10 +47,14 @@ import OfflineSync from '../pages/field/OfflineSync';
 
 // Role 6: Citizen Pages
 import CitizenDashboard from '../pages/citizen/CitizenDashboard';
+import MyLand from '../pages/citizen/MyLand';
 import LandClaimStatus from '../pages/citizen/LandClaimStatus';
 import CompensationBreakup from '../pages/citizen/CompensationBreakup';
 import RRBenefits from '../pages/citizen/RRBenefits';
 import GrievancePortal from '../pages/citizen/GrievancePortal';
+import Documents from '../pages/citizen/Documents';
+import Notifications from '../pages/citizen/Notifications';
+import Profile from '../pages/citizen/Profile';
 
 const RoleRootRedirect = () => {
   const { user } = useAuth();
@@ -117,10 +121,17 @@ export const AppRoutes = () => {
 
           {/* Role 6: Citizen Routes */}
           <Route path="/citizen" element={<CitizenDashboard />} />
+          <Route path="/citizen/home" element={<CitizenDashboard />} />
+          <Route path="/citizen/my-land" element={<MyLand />} />
           <Route path="/citizen/claim-status" element={<LandClaimStatus />} />
+          <Route path="/citizen/acquisition-status" element={<LandClaimStatus />} />
           <Route path="/citizen/compensation" element={<CompensationBreakup />} />
+          <Route path="/citizen/rr" element={<RRBenefits />} />
           <Route path="/citizen/rr-benefits" element={<RRBenefits />} />
+          <Route path="/citizen/documents" element={<Documents />} />
           <Route path="/citizen/grievances" element={<GrievancePortal />} />
+          <Route path="/citizen/notifications" element={<Notifications />} />
+          <Route path="/citizen/profile" element={<Profile />} />
         </Route>
       </Route>
 
