@@ -43,6 +43,8 @@ export const RoleSidebar = () => {
     ],
     [ROLES.DISTRICT_COLLECTOR]: [
       { label: 'LAA Collector Dashboard', to: '/district', icon: LayoutDashboard, exact: true },
+      { label: 'Projects', to: '/district/projects', icon: Building2 },
+      { label: 'Parcels', to: '/district/parcels', icon: LandPlot },
       { label: 'SIA Workflow (Sec 4-6)', to: '/district/sia', icon: Users },
       { label: 'Section Tracker (4, 11, 19)', to: '/district/tracker', icon: FileSpreadsheet },
       { label: 'Land Valuation Engine', to: '/district/valuation', icon: Calculator },
