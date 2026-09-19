@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { mockGrievances } from '../../mock/grievances';
+;
 import { HelpCircle, Plus, CheckCircle2, Clock, MessageSquare, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const GrievancePortal = () => {
+  const [grievances, setGrievances] = useState([]);
+  useEffect(() => {
+    getGrievances().then(setGrievances).catch(console.error);
+  }, []);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

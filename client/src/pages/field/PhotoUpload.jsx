@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
+import { getParcels } from '../../services/parcelService';
 import { mockParcels } from '../../mock/parcels';
+;
 import {
   Camera,
   Upload,
@@ -20,6 +22,11 @@ import {
 import { Link } from 'react-router-dom';
 
 export const PhotoUpload = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+
   const [selectedParcelId, setSelectedParcelId] = useState(mockParcels[0].id);
   const parcel = mockParcels.find((p) => p.id === selectedParcelId) || mockParcels[0];
 

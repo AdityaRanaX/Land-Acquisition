@@ -1,17 +1,11 @@
-import { mockFamilies } from '../mock/families';
+import { rrApi } from './api/index';
 
-export const getFamilies = (filters = {}) => {
-  let list = [...mockFamilies];
-  if (filters.projectId) {
-    list = list.filter((f) => f.projectId === filters.projectId);
-  }
-  if (filters.category) {
-    list = list.filter((f) => f.socialCategory === filters.category);
-  }
-  return Promise.resolve(list);
+export const getFamilies = async (filters = {}) => {
+  const res = await rrApi.getFamilies(filters);
+  return res.data;
 };
 
-export const getFamilyById = (id) => {
-  const family = mockFamilies.find((f) => f.id === id);
-  return Promise.resolve(family || mockFamilies[0]);
+export const getFamilyById = async (id) => {
+  const res = await rrApi.getFamilies({ id });
+  return res.data[0];
 };

@@ -1,9 +1,11 @@
-import { mockReports } from '../mock/reports';
+import { gisApi } from './api/index';
 
-export const getNationalStats = () => {
-  return Promise.resolve(mockReports.nationalStats);
+export const getNationalStats = async () => {
+  const res = await gisApi.getGISStats();
+  return res.data;
 };
 
-export const getStateStats = () => {
-  return Promise.resolve(mockReports.stateStats);
+export const getStateStats = async () => {
+  const res = await gisApi.getGISStats();
+  return res.data;
 };

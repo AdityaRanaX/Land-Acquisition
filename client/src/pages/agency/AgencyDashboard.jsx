@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { KPICard } from '../../components/ui/KPICard';
+import { getProjects } from '../../services/projectService';
 import { mockProjects } from '../../mock/projects';
+;
 import { Building2, FolderPlus, LandPlot, Coins, ArrowRight, FileText, CheckCircle2, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const AgencyDashboard = () => {
+  const [projects, setProjects] = useState([]);
+  useEffect(() => {
+    getProjects().then(setProjects).catch(console.error);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

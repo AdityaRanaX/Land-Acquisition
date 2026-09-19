@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { mockDocuments } from '../../mock/documents';
+;
 import { FileSearch, CheckCircle2, Scan, Camera, ArrowLeft, ArrowRight, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const FieldDocVerification = () => {
+  const [documents, setDocuments] = useState([]);
+  useEffect(() => {
+    getDocuments().then(setDocuments).catch(console.error);
+  }, []);
+
   const [doc, setDoc] = useState(mockDocuments[0]);
   const [scanned, setScanned] = useState(false);
 

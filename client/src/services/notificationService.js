@@ -1,19 +1,15 @@
-import { mockNotifications } from '../mock/notifications';
+import { notificationApi } from './api/index';
 
-let notificationsStore = [...mockNotifications];
-
-export const getNotifications = () => {
-  return Promise.resolve(notificationsStore);
+export const getNotifications = async () => {
+  const res = await notificationApi.getMyNotifications();
+  return Array.isArray(res.data) ? res.data : res.data?.data || [];
 };
 
-export const markNotificationRead = (id) => {
-  notificationsStore = notificationsStore.map((n) =>
-    n.id === id ? { ...n, isRead: true } : n
-  );
-  return Promise.resolve(true);
+export const markNotificationRead = async (id) => {
+  const res = await notificationApi.markAsRead(id);
+  return res.data;
 };
 
-export const markAllNotificationsRead = () => {
-  notificationsStore = notificationsStore.map((n) => ({ ...n, isRead: true }));
-  return Promise.resolve(true);
+export const markAllNotificationsRead = async () => {
+  return true;
 };

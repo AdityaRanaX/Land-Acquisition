@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
-import { UserCheck, Shield, MapPin, Check, RefreshCw, AlertCircle } from 'lucide-react';
+import { getParcels } from '../../services/parcelService';
 import { mockParcels } from '../../mock/parcels';
+import { UserCheck, Shield, MapPin, Check, RefreshCw, AlertCircle } from 'lucide-react';
+;
 
 const mockSurveyors = [
   { id: 'SURV-01', name: 'Kiran Thorat (Talathi)', zone: 'Haveli / Wagholi', activeAssignments: 8, completed: 34, phone: '+91 9822019921', status: 'ACTIVE' },
@@ -15,6 +17,12 @@ const mockSurveyors = [
 ];
 
 export const OfficerAssignment = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+  const displayParcels = parcels.length > 0 ? parcels : mockParcels;
+
   const [selectedSurveyor, setSelectedSurveyor] = useState(mockSurveyors[0].id);
   const [selectedParcels, setSelectedParcels] = useState([]);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -103,10 +111,10 @@ export const OfficerAssignment = () => {
                       <input
                         type="checkbox"
                         onChange={(e) => {
-                          if (e.target.checked) setSelectedParcels(mockParcels.map(p => p.id));
+                          if (e.target.checked) setSelectedParcels(displayParcels.map(p => p.id));
                           else setSelectedParcels([]);
                         }}
-                        checked={selectedParcels.length === mockParcels.length}
+                        checked={displayParcels.length > 0 && selectedParcels.length === displayParcels.length}
                         className="rounded border-chamoisee text-kobicha focus:ring-kobicha"
                       />
                     </th>
@@ -118,7 +126,7 @@ export const OfficerAssignment = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-chamoisee/10">
-                  {mockParcels.map((parcel) => {
+                  {displayParcels.map((parcel) => {
                     const isSelected = selectedParcels.includes(parcel.id);
                     return (
                       <tr

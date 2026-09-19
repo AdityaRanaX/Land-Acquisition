@@ -8,7 +8,7 @@ export const NotificationBell = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    getNotifications().then(setNotifications);
+    getNotifications().then(setNotifications).catch(() => setNotifications([]));
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;

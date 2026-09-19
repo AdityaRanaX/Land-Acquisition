@@ -10,7 +10,7 @@ export const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    getNotifications().then(setNotifications);
+    getNotifications().then(setNotifications).catch(() => setNotifications([]));
   }, []);
 
   const handleRead = (id) => {

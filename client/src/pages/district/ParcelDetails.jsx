@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { mockParcels } from '../../mock/parcels';
-import { mockFamilies } from '../../mock/families';
-import { mockCompensation } from '../../mock/compensation';
+;
+;
+;
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { getParcels } from '../../services/parcelService';
+import { getFamilies } from '../../services/familyService';
+import { mockParcels } from '../../mock/parcels';
+import { mockFamilies } from '../../mock/families';
+import { mockCompensation } from '../../mock/compensation';
 import {
   ArrowLeft,
   MapPin,
@@ -22,6 +27,15 @@ import {
 } from 'lucide-react';
 
 export const ParcelDetails = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+  const [families, setFamilies] = useState([]);
+  useEffect(() => {
+    getFamilies().then(setFamilies).catch(console.error);
+  }, []);
+
   const { id } = useParams();
   const parcel = mockParcels.find((p) => p.id === id) || mockParcels[0];
   const family = mockFamilies.find((f) => f.familyId === parcel?.familyId);

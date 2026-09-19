@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { getParcels } from '../../services/parcelService';
 import { mockParcels } from '../../mock/parcels';
+;
 import { History, CheckCircle2, AlertTriangle, ArrowLeft, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const VerificationHistory = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-12">
       <div className="flex items-center justify-between">

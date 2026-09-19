@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { DelayRadar } from '../../components/shared/DelayRadar';
-import { mockParcels } from '../../mock/parcels';
+import { getParcels } from '../../services/parcelService';
+;
 import { AlertTriangle, Clock, Calendar, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const DistrictDelayRadar = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>

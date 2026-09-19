@@ -1,33 +1,16 @@
-import { mockGrievances } from '../mock/grievances';
+import { grievanceApi } from './api/index';
 
-let grievancesStore = [...mockGrievances];
-
-export const getGrievances = (filters = {}) => {
-  let list = [...grievancesStore];
-  if (filters.status) {
-    list = list.filter((g) => g.status === filters.status);
-  }
-  if (filters.category) {
-    list = list.filter((g) => g.category === filters.category);
-  }
-  return Promise.resolve(list);
+export const getGrievances = async (filters = {}) => {
+  const res = await grievanceApi.getGrievances(filters);
+  return res.data;
 };
 
-export const getGrievanceById = (id) => {
-  const grv = grievancesStore.find((g) => g.id === id || g.ticketNumber === id);
-  return Promise.resolve(grv || grievancesStore[0]);
+export const getGrievanceById = async (id) => {
+  const res = await grievanceApi.getGrievances({ id });
+  return res.data[0];
 };
 
-export const submitGrievance = (grievanceData) => {
-  const newGrievance = {
-    id: `GRV-${Date.now().toString().slice(-4)}`,
-    ticketNumber: `GRV-${Math.floor(100000 + Math.random() * 900000)}`,
-    createdAt: new Date().toISOString(),
-    status: 'SUBMITTED',
-    hearingDate: null,
-    assignedOfficer: 'Dr. Suhas Diwase (IAS)',
-    ...grievanceData
-  };
-  grievancesStore = [newGrievance, ...grievancesStore];
-  return Promise.resolve(newGrievance);
+export const submitGrievance = async (grievanceData) => {
+  const res = await grievanceApi.submitGrievance(grievanceData);
+  return res.data;
 };
