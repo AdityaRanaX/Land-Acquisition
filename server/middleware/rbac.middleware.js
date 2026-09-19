@@ -47,6 +47,7 @@ const scopeJurisdiction = (req, res, next) => {
     }
     if (req.user.jurisdiction?.district) {
       req.jurisdictionFilter.district = req.user.jurisdiction.district;
+      req.jurisdictionFilter.projectDistrict = req.user.jurisdiction.district;
     }
     return next();
   }

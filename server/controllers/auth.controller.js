@@ -78,6 +78,88 @@ const verifyOtp = async (req, res, next) => {
   }
 };
 
+// @desc Resend OTP for 2FA or password recovery
+// @route POST /api/auth/resend-otp
+const resendOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return ApiResponse.badRequest(res, 'Email is required');
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return ApiResponse.notFound(res, 'User not found');
+    }
+
+    const otp = generateOTP();
+    await sendOTP(email, otp);
+
+    return ApiResponse.success(res, { email }, 'A fresh OTP has been sent');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Request Password Reset OTP
+// @route POST /api/auth/forgot-password
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return ApiResponse.badRequest(res, 'Email is required');
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return ApiResponse.notFound(res, 'No user found with this email');
+    }
+
+    const otp = generateOTP();
+    await sendOTP(email, otp);
+
+    return ApiResponse.success(
+      res,
+      { email },
+      'Password reset OTP sent to registered email'
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Reset Password with OTP
+// @route POST /api/auth/reset-password
+const resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return ApiResponse.badRequest(res, 'Email, OTP, and new password are required');
+    }
+
+    if (newPassword.length < 6) {
+      return ApiResponse.badRequest(res, 'Password must be at least 6 characters');
+    }
+
+    const isValid = verifyStoredOTP(email, otp);
+    if (!isValid) {
+      return ApiResponse.badRequest(res, 'Invalid or expired OTP');
+    }
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return ApiResponse.notFound(res, 'User not found');
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return ApiResponse.success(res, null, 'Password successfully reset. Please log in with your new password');
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc Get current logged in user
 // @route GET /api/auth/me
 const getMe = async (req, res, next) => {
@@ -92,5 +174,8 @@ const getMe = async (req, res, next) => {
 module.exports = {
   login,
   verifyOtp,
+  resendOtp,
+  forgotPassword,
+  resetPassword,
   getMe
 };

@@ -19,5 +19,11 @@ router.put(
   audit('UPDATE_GRIEVANCE_STATUS', 'GRIEVANCES'),
   updateGrievance
 );
+router.patch(
+  '/:id',
+  authorize('DISTRICT_COLLECTOR', 'STATE_OFFICER', 'CENTRAL_ADMIN'),
+  audit('UPDATE_GRIEVANCE_STATUS', 'GRIEVANCES'),
+  updateGrievance
+);
 
 module.exports = router;

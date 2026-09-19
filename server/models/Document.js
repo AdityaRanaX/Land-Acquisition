@@ -62,6 +62,10 @@ const documentSchema = new mongoose.Schema(
       confidenceScore: Number
     },
     verificationRemarks: String,
+    requestedAction: {
+      type: String,
+      enum: ['REQUEST_NEW_DOCUMENT', 'ESCALATE']
+    },
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'

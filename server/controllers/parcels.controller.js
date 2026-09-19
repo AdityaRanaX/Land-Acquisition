@@ -7,6 +7,7 @@ const getParcels = async (req, res, next) => {
   try {
     const { projectId, district, village, status, unverifiedOnly } = req.query;
     const filter = { ...req.jurisdictionFilter };
+    delete filter.projectDistrict;
 
     if (projectId) filter.project = projectId;
     if (district) filter.district = district;
@@ -31,7 +32,15 @@ const getParcels = async (req, res, next) => {
 // @route GET /api/parcels/:id
 const getParcelById = async (req, res, next) => {
   try {
-    const parcel = await Parcel.findById(req.params.id)
+    const filter = { _id: req.params.id };
+    if (req.user.role === 'STATE_OFFICER') filter.state = req.user.jurisdiction?.state;
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      filter.state = req.user.jurisdiction?.state;
+      filter.district = req.user.jurisdiction?.district;
+    }
+    if (req.user.role === 'CITIZEN') filter.citizenUser = req.user._id;
+
+    const parcel = await Parcel.findOne(filter)
       .populate('project')
       .populate('citizenUser', 'name email phone');
 
@@ -91,9 +100,56 @@ const verifyParcelGroundSurvey = async (req, res, next) => {
   }
 };
 
+// @desc Update parcel status, resolve discrepancy, or assign field officer
+// @route PATCH /api/parcels/:id
+const updateParcel = async (req, res, next) => {
+  try {
+    const {
+      assignedSurveyor,
+      acquisitionStatus,
+      resolveDiscrepancy,
+      baseMarketRatePerAcreINR,
+      fieldNotes,
+      primaryOwnerName,
+      surveyNumber
+    } = req.body;
+
+    const parcel = await Parcel.findById(req.params.id);
+    if (!parcel) {
+      return ApiResponse.notFound(res, 'Parcel not found');
+    }
+
+    if (assignedSurveyor) {
+      if (!parcel.fieldVerification) parcel.fieldVerification = {};
+      parcel.fieldVerification.verifiedBy = assignedSurveyor;
+    }
+
+    if (resolveDiscrepancy) {
+      if (!parcel.fieldVerification) parcel.fieldVerification = {};
+      parcel.fieldVerification.discrepancyDetected = false;
+      parcel.fieldVerification.discrepancyDetails = `Resolved: ${fieldNotes || 'Verified by District Authority'}`;
+      parcel.acquisitionStatus = 'SURVEY_VERIFIED';
+    } else if (acquisitionStatus) {
+      parcel.acquisitionStatus = acquisitionStatus;
+    }
+
+    if (baseMarketRatePerAcreINR !== undefined) parcel.baseMarketRatePerAcreINR = baseMarketRatePerAcreINR;
+    if (primaryOwnerName) parcel.primaryOwnerName = primaryOwnerName;
+    if (surveyNumber) parcel.surveyNumber = surveyNumber;
+    if (fieldNotes && parcel.fieldVerification) parcel.fieldVerification.fieldNotes = fieldNotes;
+
+    await parcel.save();
+
+    return ApiResponse.success(res, parcel, 'Parcel updated successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getParcels,
   getParcelById,
   createParcel,
+  updateParcel,
   verifyParcelGroundSurvey
 };
