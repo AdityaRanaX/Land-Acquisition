@@ -6,39 +6,50 @@ export const KPICard = ({
   subtitle,
   icon: Icon,
   trend,
-  color = 'sky',
+  color = 'kobicha',
   className = ''
 }) => {
-  const colorMap = {
-    sky: 'from-sky-500/10 to-transparent border-sky-500/20 text-sky-400 bg-sky-500/10',
-    emerald: 'from-emerald-500/10 to-transparent border-emerald-500/20 text-emerald-400 bg-emerald-500/10',
-    amber: 'from-amber-500/10 to-transparent border-amber-500/20 text-amber-400 bg-amber-500/10',
-    purple: 'from-purple-500/10 to-transparent border-purple-500/20 text-purple-400 bg-purple-500/10',
-    rose: 'from-rose-500/10 to-transparent border-rose-500/20 text-rose-400 bg-rose-500/10'
+  const colorStyles = {
+    kobicha: 'border-l-4 border-l-kobicha bg-surface',
+    success: 'border-l-4 border-l-status-success bg-surface',
+    warning: 'border-l-4 border-l-status-warning bg-surface',
+    danger: 'border-l-4 border-l-status-danger bg-surface',
+    info: 'border-l-4 border-l-status-info bg-surface',
+    taupe: 'border-l-4 border-l-taupe bg-surface',
   };
 
-  const activeColor = colorMap[color] || colorMap.sky;
+  const iconBgStyles = {
+    kobicha: 'bg-kobicha/10 text-kobicha',
+    success: 'bg-[#6B7B4C]/15 text-[#4D5A34]',
+    warning: 'bg-[#C99A3F]/15 text-[#8F6A22]',
+    danger: 'bg-[#A24A3F]/15 text-[#7E332A]',
+    info: 'bg-[#5B7A8C]/15 text-[#3D5665]',
+    taupe: 'bg-taupe/10 text-taupe',
+  };
+
+  const activeBorder = colorStyles[color] || colorStyles.kobicha;
+  const activeIconBg = iconBgStyles[color] || iconBgStyles.kobicha;
 
   return (
-    <div className={`glass-card p-5 rounded-xl border border-slate-800 bg-gradient-to-b ${activeColor} relative overflow-hidden ${className}`}>
-      <div className="flex items-start justify-between">
+    <div className={`p-5 rounded-xl border border-chamoisee/25 shadow-card ${activeBorder} ${className}`}>
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</p>
-          <h4 className="text-2xl font-bold text-white mt-1.5">{value}</h4>
-          {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">{title}</p>
+          <h4 className="text-2xl font-bold text-bistre mt-1.5 tracking-tight">{value}</h4>
+          {subtitle && <p className="text-xs text-text-muted mt-1 leading-relaxed">{subtitle}</p>}
         </div>
         {Icon && (
-          <div className={`p-3 rounded-xl ${activeColor} border flex items-center justify-center`}>
+          <div className={`p-3 rounded-xl shrink-0 ${activeIconBg}`}>
             <Icon className="w-5 h-5" />
           </div>
         )}
       </div>
       {trend && (
-        <div className="mt-3 pt-3 border-t border-slate-800/60 flex items-center gap-1.5 text-xs">
-          <span className={trend.isPositive ? 'text-emerald-400' : 'text-rose-400'}>
+        <div className="mt-3 pt-3 border-t border-chamoisee/15 flex items-center gap-1.5 text-xs">
+          <span className={`font-semibold ${trend.isPositive ? 'text-[#4D5A34]' : 'text-[#7E332A]'}`}>
             {trend.isPositive ? '↑' : '↓'} {trend.text}
           </span>
-          {trend.label && <span className="text-slate-500">{trend.label}</span>}
+          {trend.label && <span className="text-text-muted">{trend.label}</span>}
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '../../components/ui/Card';
 import { Table } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
@@ -9,17 +9,17 @@ export const StateEscalations = () => {
   const escalations = [
     {
       id: 'ESC-9901',
-      project: 'Pune-Nashik Semi High-Speed Rail',
+      project: 'Pune-Nashik Semi High-Speed Rail Corridor',
       district: 'Pune',
       type: 'Statutory 12-Month Lapse Alert',
-      summary: 'Section 19 declaration pending for 11 months since Sec 11 notification.',
+      summary: 'Section 19 declaration pending for 11.8 months since Sec 11 notification.',
       urgency: 'CRITICAL',
       assignedCollector: 'Dr. Suhas Diwase (IAS)',
       deadline: '10-Oct-2024'
     },
     {
       id: 'ESC-8834',
-      project: 'Pune-Bengaluru Green Expressway',
+      project: 'Pune-Bengaluru Green Expressway (Package 4A)',
       district: 'Satara',
       type: 'Valuation Hearing Deadlock',
       summary: 'Objection filed by 40 farmers in Shirwal regarding circle rate multipliers.',
@@ -30,17 +30,17 @@ export const StateEscalations = () => {
   ];
 
   const columns = [
-    { title: 'Case ID', key: 'id', render: (v) => <span className="font-mono font-bold text-sky-400">{v}</span> },
-    { title: 'Project Name', key: 'project', className: 'font-semibold text-white' },
+    { title: 'Case ID', key: 'id', render: (v) => <span className="font-mono font-bold text-kobicha">{v}</span> },
+    { title: 'Project Name', key: 'project', className: 'font-bold text-bistre' },
     { title: 'District', key: 'district' },
     { title: 'Escalation Category', key: 'type' },
     {
       title: 'Severity',
       key: 'urgency',
-      render: (v) => <Badge variant={v === 'CRITICAL' ? 'danger' : 'warning'} dot>{v}</Badge>
+      render: (v) => <Badge status={v} dot>{v}</Badge>
     },
     { title: 'Assigned Collector', key: 'assignedCollector' },
-    { title: 'Deadline', key: 'deadline', render: (v) => <span className="text-rose-400 font-semibold">{v}</span> },
+    { title: 'Deadline', key: 'deadline', render: (v) => <span className="text-[#7E332A] font-bold">{v}</span> },
     {
       title: 'Action',
       key: 'act',
@@ -51,8 +51,8 @@ export const StateEscalations = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-white">State-Level Escalations & Bottlenecks</h2>
-        <p className="text-xs text-slate-400">High-priority bottlenecks escalated directly to Principal Secretary (Revenue)</p>
+        <h2 className="text-xl font-bold text-bistre">State-Level Escalations & Bottlenecks</h2>
+        <p className="text-xs text-text-muted">High-priority bottlenecks escalated directly to Principal Secretary (Revenue)</p>
       </div>
 
       <Card title="Active Statutory Escalation Queue" subtitle="Collector notices and hearing deadline trackers">

@@ -10,14 +10,14 @@ export const Card = ({
   bodyClassName = ''
 }) => {
   return (
-    <div className={`glass-card rounded-xl overflow-hidden border border-slate-800/80 bg-slate-900/60 transition-all duration-200 ${className}`}>
+    <div className={`bg-surface rounded-xl border border-chamoisee/25 shadow-card transition-all ${className}`}>
       {(title || action) && (
-        <div className={`px-5 py-4 border-b border-slate-800/80 flex items-center justify-between gap-4 ${headerClassName}`}>
+        <div className={`px-5 py-4 border-b border-chamoisee/15 flex items-center justify-between gap-4 bg-surface ${headerClassName}`}>
           <div>
-            {title && <h3 className="font-semibold text-slate-100 text-base">{title}</h3>}
-            {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+            {title && <h3 className="font-bold text-bistre text-base tracking-tight">{title}</h3>}
+            {subtitle && <p className="text-xs text-text-muted mt-0.5">{subtitle}</p>}
           </div>
-          {action && <div className="flex items-center gap-2">{action}</div>}
+          {action && <div className="flex items-center gap-2 shrink-0">{action}</div>}
         </div>
       )}
       <div className={`p-5 ${bodyClassName}`}>{children}</div>

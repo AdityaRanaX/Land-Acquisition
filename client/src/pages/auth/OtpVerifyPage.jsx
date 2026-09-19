@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
-import { ShieldAlert, ArrowRight, KeyRound } from 'lucide-react';
+import { ShieldCheck, ArrowRight, KeyRound } from 'lucide-react';
 import apiClient from '../../services/api/apiClient';
 
 export const OtpVerifyPage = () => {
@@ -13,7 +14,6 @@ export const OtpVerifyPage = () => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { switchRole } = useAuth();
 
   const handleVerify = async (e) => {
     e.preventDefault();
@@ -39,42 +39,44 @@ export const OtpVerifyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-page flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400">
+          <div className="inline-flex p-3 rounded-2xl bg-kobicha/10 text-kobicha border border-chamoisee/30">
             <KeyRound className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-white">Two-Factor Authentication</h2>
-          <p className="text-xs text-slate-400">
-            Enter the 6-digit verification code sent to <strong className="text-slate-200">{email}</strong>
+          <h1 className="text-xl font-black text-bistre">Two-Factor Authentication</h1>
+          <p className="text-xs text-text-muted">
+            Enter the 6-digit verification code sent to <strong className="text-bistre">{email}</strong>
           </p>
         </div>
 
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 bg-slate-900/80 space-y-4">
-          {error && <div className="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">{error}</div>}
+        <Card bodyClassName="p-6 space-y-4">
+          {error && <div className="p-3 rounded-lg bg-status-danger/10 text-status-danger text-xs font-semibold">{error}</div>}
 
           <form onSubmit={handleVerify} className="space-y-4">
-            <Input
-              label="6-Digit Verification Code"
-              type="text"
-              maxLength={6}
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              placeholder="123456"
-              required
-              className="text-center text-lg tracking-widest font-mono"
-            />
+            <div>
+              <label className="block text-xs font-bold text-bistre mb-1">6-Digit Verification Code</label>
+              <Input
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="123456"
+                required
+                className="text-center text-lg tracking-widest font-mono"
+              />
+            </div>
 
-            <Button type="submit" variant="primary" className="w-full" loading={loading} icon={ArrowRight}>
-              Verify & Enter System
+            <Button type="submit" variant="primary" className="w-full gap-1.5" loading={loading}>
+              Verify & Enter System <ArrowRight className="w-4 h-4" />
             </Button>
           </form>
 
-          <p className="text-[11px] text-slate-500 text-center">
-            Demo Hint: Use <span className="text-sky-400 font-mono">123456</span> or check server terminal console.
+          <p className="text-[11px] text-text-muted text-center">
+            Demo Hint: Use <span className="text-kobicha font-mono font-bold">123456</span> or default seed login.
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );

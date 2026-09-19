@@ -4,7 +4,8 @@ import { Table } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
-import { MapPin, FileSpreadsheet, Eye } from 'lucide-react';
+import { Eye, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const DistrictOverview = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('Pune');
@@ -17,25 +18,37 @@ export const DistrictOverview = () => {
   ];
 
   const columns = [
-    { title: 'Taluka / Sub-Division', key: 'taluka', className: 'font-bold text-white' },
+    { title: 'Taluka / Sub-Division', key: 'taluka', className: 'font-bold text-bistre' },
     { title: 'Notified Villages', key: 'villages' },
     { title: 'Total Parcels', key: 'parcels' },
     { title: 'Area (Acres)', key: 'areaAcres' },
-    { title: 'Valuation Progress', key: 'valuationDone', render: (v) => <span className="font-semibold text-emerald-400">{v}</span> },
-    { title: 'Statutory Stage', key: 'collectorStatus', render: (v) => <Badge variant="primary">{v}</Badge> },
+    {
+      title: 'Valuation Progress',
+      key: 'valuationDone',
+      render: (v) => <span className="font-bold text-[#4D5A34]">{v}</span>
+    },
+    {
+      title: 'Statutory Stage',
+      key: 'collectorStatus',
+      render: (v) => <Badge status={v}>{v}</Badge>
+    },
     {
       title: 'Action',
       key: 'act',
-      render: () => <Button size="sm" variant="ghost" icon={Eye}>Inspect</Button>
+      render: () => (
+        <Link to="/district">
+          <Button size="sm" variant="outline" icon={Eye}>District View</Button>
+        </Link>
+      )
     }
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white">District-Level Acquisition Breakdown</h2>
-          <p className="text-xs text-slate-400">Sub-divisional and taluka-level progress for {selectedDistrict} District</p>
+          <h2 className="text-xl font-bold text-bistre">District-Level Acquisition Breakdown</h2>
+          <p className="text-xs text-text-muted">Sub-divisional and taluka-level progress for {selectedDistrict} District</p>
         </div>
         <div className="w-56">
           <Select
