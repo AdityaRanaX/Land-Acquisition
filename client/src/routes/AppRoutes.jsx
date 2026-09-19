@@ -11,7 +11,7 @@ import ProtectedRoute from '../components/layout/ProtectedRoute';
 import LoginPage from '../pages/auth/LoginPage';
 import OtpVerifyPage from '../pages/auth/OtpVerifyPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
-import UnauthorizedPage from '../pages/auth/UnauthorizedPage';
+import { UnauthorizedPage } from '../pages/auth/UnauthorizedPage';
 
 // Role 1: Central Pages
 import CentralDashboard from '../pages/central/CentralDashboard';

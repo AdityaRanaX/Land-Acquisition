@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen font-sans;
+    @apply bg-[#F8F4ED] text-[#4A2E1B] min-h-screen font-sans;
   }
 }
 
@@ -14,33 +14,30 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: #EFE7DC;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.8);
+  background: #C7B8A8;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 1);
+  background: #B84D28;
 }
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #F8F4ED;
+  border: 1px solid #DDD3C7;
 }
 
 .glass-card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #F8F4ED;
+  border: 1px solid #DDD3C7;
 }
 
 .glass-header {
-  background: rgba(11, 27, 61, 0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #F8F4ED;
+  border-bottom: 1px solid #DDD3C7;
 }
 
 /* Leaflet Container Defaults */
