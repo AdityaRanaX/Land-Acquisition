@@ -28,6 +28,8 @@ import StateEscalations from '../pages/state/StateEscalations';
 
 // Role 3: District Pages
 import DistrictDashboard from '../pages/district/DistrictDashboard';
+import DistrictProjects from '../pages/district/DistrictProjects';
+import DistrictProjectDetails from '../pages/district/DistrictProjectDetails';
 import SIAWorkflow from '../pages/district/SIAWorkflow';
 import SectionTracker from '../pages/district/SectionTracker';
 import LandValuation from '../pages/district/LandValuation';
@@ -98,6 +100,8 @@ export const AppRoutes = () => {
 
           {/* Role 3: District Routes */}
           <Route path="/district" element={<DistrictDashboard />} />
+          <Route path="/district/projects" element={<DistrictProjects />} />
+          <Route path="/district/projects/:id" element={<DistrictProjectDetails />} />
           <Route path="/district/sia" element={<SIAWorkflow />} />
           <Route path="/district/tracker" element={<SectionTracker />} />
           <Route path="/district/valuation" element={<LandValuation />} />
