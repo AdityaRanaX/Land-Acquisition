@@ -8,6 +8,7 @@ const getParcelsGeoJSON = async (req, res, next) => {
   try {
     const { projectId, status, district } = req.query;
     const filter = { ...req.jurisdictionFilter };
+    delete filter.projectDistrict;
 
     if (projectId) filter.project = projectId;
     if (status) filter.acquisitionStatus = status;
@@ -55,6 +56,7 @@ const getParcelsGeoJSON = async (req, res, next) => {
 const getGISStats = async (req, res, next) => {
   try {
     const filter = { ...req.jurisdictionFilter };
+    delete filter.projectDistrict;
 
     const total = await Parcel.countDocuments(filter);
     const verified = await Parcel.countDocuments({ ...filter, 'fieldVerification.isVerified': true });
@@ -78,6 +80,11 @@ const getGISStats = async (req, res, next) => {
 const getProjectsGeoJSON = async (req, res, next) => {
   try {
     const filter = { ...req.jurisdictionFilter };
+    if (filter.projectDistrict) {
+      filter.districts = filter.projectDistrict;
+      delete filter.projectDistrict;
+      delete filter.district;
+    }
     const projects = await Project.find(filter);
 
     // Build GeoJSON features for projects
@@ -127,7 +134,15 @@ const getProjectsGeoJSON = async (req, res, next) => {
 // @route GET /api/gis/parcels/:id
 const getSingleParcelGeoJSON = async (req, res, next) => {
   try {
-    const parcel = await Parcel.findById(req.params.id).populate('project', 'name code state');
+    const filter = { _id: req.params.id };
+    if (req.user.role === 'STATE_OFFICER') filter.state = req.user.jurisdiction?.state;
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      filter.state = req.user.jurisdiction?.state;
+      filter.district = req.user.jurisdiction?.district;
+    }
+    if (req.user.role === 'CITIZEN') filter.citizenUser = req.user._id;
+
+    const parcel = await Parcel.findOne(filter).populate('project', 'name code state');
     if (!parcel) {
       return ApiResponse.notFound(res, 'Parcel not found');
     }

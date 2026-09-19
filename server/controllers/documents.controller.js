@@ -1,4 +1,6 @@
 const Document = require('../models/Document');
+const Project = require('../models/Project');
+const Parcel = require('../models/Parcel');
 const ApiResponse = require('../utils/apiResponse');
 const { verifyDocumentMismatch } = require('../services/docVerify.service');
 
@@ -8,6 +10,25 @@ const getDocuments = async (req, res, next) => {
   try {
     const { parcelId, projectId, status, docType } = req.query;
     const filter = {};
+
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      const [projects, parcels] = await Promise.all([
+        Project.find({ state: req.user.jurisdiction?.state, districts: req.user.jurisdiction?.district }).select('_id'),
+        Parcel.find({ state: req.user.jurisdiction?.state, district: req.user.jurisdiction?.district }).select('_id')
+      ]);
+      filter.$or = [
+        { project: { $in: projects.map((project) => project._id) } },
+        { parcel: { $in: parcels.map((parcel) => parcel._id) } }
+      ];
+    } else if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      const projects = await Project.find({ state: req.user.jurisdiction.state }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'REQUIRING_AGENCY' && req.user.jurisdiction?.agencyName) {
+      const projects = await Project.find({ requiringAgency: req.user.jurisdiction.agencyName }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'CITIZEN') {
+      filter.uploadedBy = req.user._id;
+    }
 
     if (parcelId) filter.parcel = parcelId;
     if (projectId) filter.project = projectId;
@@ -70,19 +91,28 @@ const updateDocumentStatus = async (req, res, next) => {
     }
 
     if (action === 'ACCEPT') {
-      doc.verificationStatus = 'VERIFIED';
+      doc.verificationStatus = 'OFFICER_APPROVED';
+      doc.requestedAction = undefined;
+      doc.verifiedBy = req.user._id;
+      doc.verifiedAt = new Date();
     } else if (action === 'REJECT') {
-      doc.verificationStatus = 'REJECTED';
+      doc.verificationStatus = 'REJECTED_MISMATCH';
+      doc.requestedAction = undefined;
+      doc.verifiedBy = req.user._id;
+      doc.verifiedAt = new Date();
     } else if (action === 'REQUEST_NEW_DOCUMENT') {
       doc.verificationStatus = 'PENDING';
+      doc.requestedAction = 'REQUEST_NEW_DOCUMENT';
     } else if (action === 'ESCALATE') {
-      doc.verificationStatus = 'FLAGGED_DISCREPANCY';
+      doc.verificationStatus = 'REJECTED_MISMATCH';
+      doc.requestedAction = 'ESCALATE';
     } else if (status) {
       doc.verificationStatus = status;
     }
 
-    if (remarks) doc.verificationNotes = remarks;
-    if (mismatchFlags) doc.mismatchFlags = mismatchFlags;
+    if (remarks) doc.verificationRemarks = remarks;
+    if (mismatchFlags) doc.verificationRemarks = `${doc.verificationRemarks || ''} Mismatch flags: ${JSON.stringify(mismatchFlags)}`.trim();
+    if (action !== 'REQUEST_NEW_DOCUMENT' && action !== 'ESCALATE') doc.requestedAction = undefined;
 
     await doc.save();
 

@@ -1,5 +1,6 @@
 const Compensation = require('../models/Compensation');
 const Parcel = require('../models/Parcel');
+const Project = require('../models/Project');
 const ApiResponse = require('../utils/apiResponse');
 const { calculateStatutoryAward, simulateProjectBudget } = require('../services/compensationCalc.service');
 const { createNotification } = require('../services/notification.service');
@@ -38,6 +39,24 @@ const getCompensationAwards = async (req, res, next) => {
   try {
     const { projectId, parcelId, status } = req.query;
     const filter = {};
+
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      const projects = await Project.find({ state: req.user.jurisdiction?.state, districts: req.user.jurisdiction?.district }).select('_id');
+      const parcels = await Parcel.find({ state: req.user.jurisdiction?.state, district: req.user.jurisdiction?.district }).select('_id');
+      filter.$or = [
+        { project: { $in: projects.map((project) => project._id) } },
+        { parcel: { $in: parcels.map((parcel) => parcel._id) } }
+      ];
+    } else if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      const projects = await Project.find({ state: req.user.jurisdiction.state }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'REQUIRING_AGENCY' && req.user.jurisdiction?.agencyName) {
+      const projects = await Project.find({ requiringAgency: req.user.jurisdiction.agencyName }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'CITIZEN') {
+      const parcels = await Parcel.find({ citizenUser: req.user._id }).select('_id');
+      filter.parcel = { $in: parcels.map((parcel) => parcel._id) };
+    }
 
     if (projectId) filter.project = projectId;
     if (parcelId) filter.parcel = parcelId;
@@ -92,7 +111,23 @@ const createAward = async (req, res, next) => {
 // @route GET /api/compensation/:id
 const getCompensationById = async (req, res, next) => {
   try {
-    const award = await Compensation.findById(req.params.id)
+    const filter = { _id: req.params.id };
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      const projects = await Project.find({ state: req.user.jurisdiction?.state, districts: req.user.jurisdiction?.district }).select('_id');
+      const parcels = await Parcel.find({ state: req.user.jurisdiction?.state, district: req.user.jurisdiction?.district }).select('_id');
+      filter.$or = [
+        { project: { $in: projects.map((project) => project._id) } },
+        { parcel: { $in: parcels.map((parcel) => parcel._id) } }
+      ];
+    } else if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      const projects = await Project.find({ state: req.user.jurisdiction.state }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'CITIZEN') {
+      const parcels = await Parcel.find({ citizenUser: req.user._id }).select('_id');
+      filter.parcel = { $in: parcels.map((parcel) => parcel._id) };
+    }
+
+    const award = await Compensation.findOne(filter)
       .populate('parcel')
       .populate('project', 'name code state')
       .populate('calculatedBy', 'name email');
@@ -123,10 +158,9 @@ const updateCompensationStatus = async (req, res, next) => {
       award.disbursementStatus = newStatus;
     }
 
-    if (utrTransactionNumber) award.utrTransactionNumber = utrTransactionNumber;
-    if (disbursedAmountINR) award.disbursedAmountINR = disbursedAmountINR;
+    if (utrTransactionNumber) award.transactionReference = utrTransactionNumber;
 
-    if (newStatus === 'DISBURSED' || newStatus === 'PAID') {
+    if (newStatus === 'DISBURSED') {
       award.disbursedDate = new Date();
       if (award.parcel) {
         await Parcel.findByIdAndUpdate(award.parcel._id || award.parcel, {

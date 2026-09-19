@@ -9,6 +9,12 @@ const getProjects = async (req, res, next) => {
     const { status, state, district, purpose, search } = req.query;
     const filter = { ...req.jurisdictionFilter };
 
+    if (filter.projectDistrict) {
+      filter.districts = filter.projectDistrict;
+      delete filter.projectDistrict;
+      delete filter.district;
+    }
+
     if (status) filter.status = status;
     if (state) filter.state = state;
     if (district) filter.districts = district;
@@ -34,7 +40,19 @@ const getProjects = async (req, res, next) => {
 // @route GET /api/projects/:id
 const getProjectById = async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id)
+    const filter = { _id: req.params.id };
+    if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      filter.state = req.user.jurisdiction.state;
+    }
+    if ((req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') && req.user.jurisdiction?.district) {
+      filter.state = req.user.jurisdiction.state;
+      filter.districts = req.user.jurisdiction.district;
+    }
+    if (req.user.role === 'REQUIRING_AGENCY' && req.user.jurisdiction?.agencyName) {
+      filter.requiringAgency = req.user.jurisdiction.agencyName;
+    }
+
+    const project = await Project.findOne(filter)
       .populate('assignedCollector', 'name email phone designation')
       .populate('createdAgencyUser', 'name email');
 

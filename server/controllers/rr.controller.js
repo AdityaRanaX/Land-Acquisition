@@ -1,5 +1,6 @@
 const RR = require('../models/RR');
 const Family = require('../models/Family');
+const Project = require('../models/Project');
 const ApiResponse = require('../utils/apiResponse');
 
 // @desc Get R&R packages
@@ -8,6 +9,17 @@ const getRRPackages = async (req, res, next) => {
   try {
     const { projectId, status, familyId } = req.query;
     const filter = {};
+
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      const projects = await Project.find({ state: req.user.jurisdiction?.state, districts: req.user.jurisdiction?.district }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      const projects = await Project.find({ state: req.user.jurisdiction.state }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'REQUIRING_AGENCY' && req.user.jurisdiction?.agencyName) {
+      const projects = await Project.find({ requiringAgency: req.user.jurisdiction.agencyName }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    }
 
     if (projectId) filter.project = projectId;
     if (status) filter.deliveryStatus = status;
@@ -82,6 +94,12 @@ const getFamilies = async (req, res, next) => {
   try {
     const { projectId } = req.query;
     const filter = {};
+    if (req.user.role === 'DISTRICT_COLLECTOR' || req.user.role === 'FIELD_SURVEYOR') {
+      const projects = await Project.find({ state: req.user.jurisdiction?.state, districts: req.user.jurisdiction?.district }).select('_id');
+      filter.project = { $in: projects.map((project) => project._id) };
+    } else if (req.user.role === 'STATE_OFFICER' && req.user.jurisdiction?.state) {
+      filter.project = { $in: (await Project.find({ state: req.user.jurisdiction.state }).select('_id')).map((project) => project._id) };
+    }
     if (projectId) filter.project = projectId;
 
     const families = await Family.find(filter)
@@ -98,24 +116,24 @@ const getFamilies = async (req, res, next) => {
 // @route PATCH /api/rr/:id
 const updateRRPackage = async (req, res, next) => {
   try {
-    const { deliveryStatus, status, completionDate, remarks, benefits } = req.body;
+    const { deliveryStatus, status, completedDate, remarks } = req.body;
     const rrPackage = await RR.findById(req.params.id);
 
     if (!rrPackage) {
       return ApiResponse.notFound(res, 'R&R package not found');
     }
 
-    const newStatus = deliveryStatus || status;
+    const requestedStatus = deliveryStatus || status;
+    const newStatus = requestedStatus === 'COMPLETED' ? 'FULLY_DELIVERED' : requestedStatus;
     if (newStatus) {
       rrPackage.deliveryStatus = newStatus;
     }
 
-    if (completionDate || newStatus === 'COMPLETED') {
-      rrPackage.completionDate = completionDate || new Date();
+    if (completedDate || newStatus === 'FULLY_DELIVERED') {
+      rrPackage.completedDate = completedDate || new Date();
     }
 
     if (remarks) rrPackage.remarks = remarks;
-    if (benefits) rrPackage.benefits = benefits;
 
     await rrPackage.save();
 

@@ -25,11 +25,15 @@ const getMyNotifications = async (req, res, next) => {
 // @route PUT /api/notifications/:id/read
 const markAsRead = async (req, res, next) => {
   try {
-    const notification = await Notification.findByIdAndUpdate(
-      req.params.id,
+    const notification = await Notification.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        $or: [{ recipient: req.user._id }, { recipientRole: 'ALL' }, { recipientRole: req.user.role }]
+      },
       { isRead: true, readAt: new Date() },
       { new: true }
     );
+    if (!notification) return ApiResponse.notFound(res, 'Notification not found');
     return ApiResponse.success(res, notification, 'Notification marked as read');
   } catch (error) {
     next(error);
