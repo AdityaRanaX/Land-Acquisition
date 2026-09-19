@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { WhatIfSimulator } from '../../components/shared/WhatIfSimulator';
-import { mockCompensation } from '../../mock/compensation';
+import { getParcels } from '../../services/parcelService';
 import { mockParcels } from '../../mock/parcels';
+;
+;
 import { Coins, CheckCircle, FileText, Send, Download, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const CompensationManagement = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+
   const [activeParcel, setActiveParcel] = useState(mockParcels[0]);
   const [disbursedParcels, setDisbursedParcels] = useState([]);
 

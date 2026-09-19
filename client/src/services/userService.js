@@ -1,13 +1,16 @@
-import { mockUsers, mockFieldOfficers } from '../mock/users';
+import { userApi, authApi } from './api/index';
 
-export const getUsers = () => {
-  return Promise.resolve(Object.values(mockUsers));
+export const getUsers = async () => {
+  const res = await userApi.getUsers();
+  return res.data;
 };
 
-export const getFieldOfficers = () => {
-  return Promise.resolve(mockFieldOfficers);
+export const getFieldOfficers = async () => {
+  const res = await userApi.getUsers({ role: 'FIELD_SURVEYOR' });
+  return res.data;
 };
 
-export const getUserProfile = (roleKey) => {
-  return Promise.resolve(mockUsers[roleKey] || mockUsers.CENTRAL_ADMIN);
+export const getUserProfile = async (roleKey) => {
+  const res = await authApi.getMe();
+  return res.data;
 };

@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { GISMap } from '../../components/gis/GISMap';
 import { useGIS } from '../../hooks/useGIS';
-import { mockParcels } from '../../mock/parcels';
+import { getParcels } from '../../services/parcelService';
+;
 import { Navigation, Compass, MapPin, Camera, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const ParcelNavigationMap = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+
   const { geoJsonData, stats } = useGIS();
 
   return (

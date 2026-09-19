@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { mockDocuments } from '../../mock/documents';
+;
 import { FileText, Download, Upload, CheckCircle2, Search, ExternalLink } from 'lucide-react';
 
 export const AgencyDocuments = () => {
+  const [documents, setDocuments] = useState([]);
+  useEffect(() => {
+    getDocuments().then(setDocuments).catch(console.error);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

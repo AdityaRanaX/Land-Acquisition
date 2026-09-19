@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { mockParcels } from '../../mock/parcels';
+import { getParcels } from '../../services/parcelService';
+;
 import { LandPlot, Search, Download, Filter, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const AgencyParcels = () => {
+  const [parcels, setParcels] = useState([]);
+  useEffect(() => {
+    getParcels().then(setParcels).catch(console.error);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [parcels, setParcels] = useState(mockParcels);
 
   const filtered = parcels.filter(
     (p) =>

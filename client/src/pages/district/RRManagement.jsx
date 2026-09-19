@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { mockFamilies } from '../../mock/families';
+;
 import { Scale, Home, Briefcase, HeartHandshake, CheckCircle2, FileSpreadsheet, Plus } from 'lucide-react';
 
 export const RRManagement = () => {
-  const [families, setFamilies] = useState(mockFamilies);
+  const [families, setFamilies] = useState([]);
+  useEffect(() => {
+    getFamilies().then(setFamilies).catch(console.error);
+  }, []);
+
 
   return (
     <div className="space-y-6">

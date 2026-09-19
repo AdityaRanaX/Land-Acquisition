@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Link } from 'react-router-dom';
-import { mockFamilies } from '../../mock/families';
+;
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -8,8 +8,12 @@ import { Input } from '../../components/ui/Input';
 import { Users, Search, Plus, Download, Home, HeartHandshake, CheckCircle } from 'lucide-react';
 
 export const AffectedFamilies = () => {
+  const [families, setFamilies] = useState([]);
+  useEffect(() => {
+    getFamilies().then(setFamilies).catch(console.error);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [families, setFamilies] = useState(mockFamilies);
 
   const filtered = families.filter(
     (f) =>

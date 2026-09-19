@@ -25,7 +25,7 @@ import NationalMap from '../pages/central/NationalMap';
 import NationalProjects from '../pages/central/NationalProjects';
 import CentralProjectDetails from '../pages/central/CentralProjectDetails';
 import StateComparison from '../pages/central/StateComparison';
-import PolicyMonitoring from '../pages/central/PolicyMonitoring';
+
 import NationalDelayRadar from '../pages/central/NationalDelayRadar';
 import NationalReports from '../pages/central/NationalReports';
 
@@ -38,7 +38,7 @@ import StateMap from '../pages/state/StateMap';
 import StateProjects from '../pages/state/StateProjects';
 import StateProjectDetails from '../pages/state/StateProjectDetails';
 import DistrictOverview from '../pages/state/DistrictOverview';
-import FundAllocation from '../pages/state/FundAllocation';
+
 import StateEscalations from '../pages/state/StateEscalations';
 import StateReports from '../pages/state/StateReports';
 
@@ -49,18 +49,18 @@ import StateReports from '../pages/state/StateReports';
 // Main / newer District implementation
 import DistrictDashboard from '../pages/district/DistrictDashboard';
 import DistrictProjects from '../pages/district/DistrictProjects';
-import DistrictProjectDetails from '../pages/district/DistrictProjectDetails';
-import DistrictGIS from '../pages/district/DistrictGIS';
+
+
 import DistrictParcels from '../pages/district/DistrictParcels';
-import DistrictParcelDetails from '../pages/district/DistrictParcelDetails';
-import DistrictFamilies from '../pages/district/DistrictFamilies';
-import DistrictFieldOfficers from '../pages/district/DistrictFieldOfficers';
-import DistrictDocuments from '../pages/district/DistrictDocuments';
-import DistrictCompensation from '../pages/district/DistrictCompensation';
-import DistrictRR from '../pages/district/DistrictRR';
+
+
+
+
+
+
 import DistrictDelayRadar from '../pages/district/DistrictDelayRadar';
-import DistrictNotifications from '../pages/district/DistrictNotifications';
-import DistrictProfile from '../pages/district/DistrictProfile';
+
+
 
 // Existing / legacy District pages
 import ProjectApproval from '../pages/district/ProjectApproval';
@@ -71,10 +71,10 @@ import OfficerAssignment from '../pages/district/OfficerAssignment';
 import DocVerification from '../pages/district/DocVerification';
 import CompensationManagement from '../pages/district/CompensationManagement';
 import RRManagement from '../pages/district/RRManagement';
-import SIAWorkflow from '../pages/district/SIAWorkflow';
-import SectionTracker from '../pages/district/SectionTracker';
-import LandValuation from '../pages/district/LandValuation';
-import AwardGeneration from '../pages/district/AwardGeneration';
+
+
+
+
 
 // ============================================================
 // ROLE 4: REQUIRING AGENCY
@@ -87,21 +87,21 @@ import ProjectTracking from '../pages/agency/ProjectTracking';
 import AgencyParcels from '../pages/agency/AgencyParcels';
 import AgencyDocuments from '../pages/agency/AgencyDocuments';
 import AgencyCommunication from '../pages/agency/AgencyCommunication';
-import ProposalStatus from '../pages/agency/ProposalStatus';
-import CostEstimation from '../pages/agency/CostEstimation';
+
+
 
 // ============================================================
 // ROLE 5: FIELD SURVEYOR
 // ============================================================
 
 import FieldDashboard from '../pages/field/FieldDashboard';
-import AssignedParcels from '../pages/field/AssignedParcels';
+
 import ParcelNavigationMap from '../pages/field/ParcelNavigationMap';
 import FieldVerificationForm from '../pages/field/FieldVerificationForm';
 import PhotoUpload from '../pages/field/PhotoUpload';
 import FieldDocVerification from '../pages/field/FieldDocVerification';
 import VerificationHistory from '../pages/field/VerificationHistory';
-import OfflineSync from '../pages/field/OfflineSync';
+
 
 // ============================================================
 // ROLE 6: CITIZEN
@@ -223,11 +223,6 @@ export const AppRoutes = () => {
             element={<NationalReports />}
           />
 
-          <Route
-            path="/central/policy"
-            element={<PolicyMonitoring />}
-          />
-
           {/* ==================================================
               ROLE 2 — STATE OFFICER
               ================================================== */}
@@ -267,11 +262,6 @@ export const AppRoutes = () => {
             element={<StateReports />}
           />
 
-          <Route
-            path="/state/funds"
-            element={<FundAllocation />}
-          />
-
           {/* ==================================================
               ROLE 3 — DISTRICT COLLECTOR
               ================================================== */}
@@ -288,11 +278,6 @@ export const AppRoutes = () => {
             element={<DistrictProjects />}
           />
 
-          <Route
-            path="/district/projects/:id"
-            element={<DistrictProjectDetails />}
-          />
-
           {/* Project approval — legacy route preserved */}
           <Route
             path="/district/approvals"
@@ -300,10 +285,6 @@ export const AppRoutes = () => {
           />
 
           {/* GIS */}
-          <Route
-            path="/district/gis"
-            element={<DistrictGIS />}
-          />
 
           {/* Legacy GIS route preserved */}
           <Route
@@ -317,11 +298,6 @@ export const AppRoutes = () => {
             element={<DistrictParcels />}
           />
 
-          <Route
-            path="/district/parcels/:id"
-            element={<DistrictParcelDetails />}
-          />
-
           {/* Legacy parcel details route preserved */}
           <Route
             path="/district/parcel-details/:id"
@@ -329,16 +305,8 @@ export const AppRoutes = () => {
           />
 
           {/* Families */}
-          <Route
-            path="/district/families"
-            element={<DistrictFamilies />}
-          />
 
           {/* Field officers */}
-          <Route
-            path="/district/field-officers"
-            element={<DistrictFieldOfficers />}
-          />
 
           {/* Legacy officer assignment route preserved */}
           <Route
@@ -347,10 +315,6 @@ export const AppRoutes = () => {
           />
 
           {/* Documents */}
-          <Route
-            path="/district/documents"
-            element={<DistrictDocuments />}
-          />
 
           {/* Legacy document verification route preserved */}
           <Route
@@ -359,10 +323,6 @@ export const AppRoutes = () => {
           />
 
           {/* Compensation */}
-          <Route
-            path="/district/compensation"
-            element={<DistrictCompensation />}
-          />
 
           {/* Legacy compensation route preserved */}
           <Route
@@ -371,10 +331,6 @@ export const AppRoutes = () => {
           />
 
           {/* Rehabilitation & Resettlement */}
-          <Route
-            path="/district/rr"
-            element={<DistrictRR />}
-          />
 
           {/* Legacy R&R route preserved */}
           <Route
@@ -389,37 +345,10 @@ export const AppRoutes = () => {
           />
 
           {/* District-specific notifications */}
-          <Route
-            path="/district/notifications"
-            element={<DistrictNotifications />}
-          />
 
           {/* District-specific profile */}
-          <Route
-            path="/district/profile"
-            element={<DistrictProfile />}
-          />
 
           {/* Existing legacy District workflow pages */}
-          <Route
-            path="/district/sia"
-            element={<SIAWorkflow />}
-          />
-
-          <Route
-            path="/district/tracker"
-            element={<SectionTracker />}
-          />
-
-          <Route
-            path="/district/valuation"
-            element={<LandValuation />}
-          />
-
-          <Route
-            path="/district/awards"
-            element={<AwardGeneration />}
-          />
 
           {/* ==================================================
               ROLE 4 — REQUIRING AGENCY
@@ -460,16 +389,6 @@ export const AppRoutes = () => {
             element={<AgencyCommunication />}
           />
 
-          <Route
-            path="/agency/proposals"
-            element={<ProposalStatus />}
-          />
-
-          <Route
-            path="/agency/cost-estimation"
-            element={<CostEstimation />}
-          />
-
           {/* ==================================================
               ROLE 5 — FIELD SURVEYOR
               ================================================== */}
@@ -477,11 +396,6 @@ export const AppRoutes = () => {
           <Route
             path="/field"
             element={<FieldDashboard />}
-          />
-
-          <Route
-            path="/field/parcels"
-            element={<AssignedParcels />}
           />
 
           <Route
@@ -507,11 +421,6 @@ export const AppRoutes = () => {
           <Route
             path="/field/history"
             element={<VerificationHistory />}
-          />
-
-          <Route
-            path="/field/sync"
-            element={<OfflineSync />}
           />
 
           {/* Existing inspection alias */}

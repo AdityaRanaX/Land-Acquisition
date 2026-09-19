@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect,  useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { SmartDocVerify } from '../../components/shared/SmartDocVerify';
-import { mockDocuments } from '../../mock/documents';
+;
 import { FileSearch, Check, X, AlertTriangle, FileText, Download } from 'lucide-react';
 
 export const DocVerification = () => {
-  const [documents, setDocuments] = useState(mockDocuments);
+  const [documents, setDocuments] = useState([]);
+  useEffect(() => {
+    getDocuments().then(setDocuments).catch(console.error);
+  }, []);
+
   const [selectedDoc, setSelectedDoc] = useState(mockDocuments[0]);
 
   const handleApprove = (docId) => {

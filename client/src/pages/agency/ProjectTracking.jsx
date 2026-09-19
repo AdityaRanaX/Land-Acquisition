@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { getProjects } from '../../services/projectService';
 import { mockProjects } from '../../mock/projects';
+;
 import { CheckCircle2, Clock, AlertTriangle, ArrowRight, Download, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const ProjectTracking = () => {
+  const [projects, setProjects] = useState([]);
+  useEffect(() => {
+    getProjects().then(setProjects).catch(console.error);
+  }, []);
+
   const proj = mockProjects[0];
 
   const statutoryStages = [
