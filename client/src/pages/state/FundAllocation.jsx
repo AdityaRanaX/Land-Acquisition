@@ -17,7 +17,7 @@ export const FundAllocation = () => {
     { title: 'Project Name', key: 'project', className: 'font-semibold text-white' },
     { title: 'Sanctioned Budget', key: 'totalSanctionedCr', render: (v) => `₹${v} Cr` },
     { title: 'Escrow Deposited', key: 'escrowDepositedCr', render: (v) => `₹${v} Cr` },
-    { title: 'Disbursed (DBT)', key: 'disbursedCr', render: (v) => <span className="font-bold text-emerald-400">₹${v} Cr</span> },
+    { title: 'Disbursed (DBT)', key: 'disbursedCr', render: (v) => <span className="font-bold text-emerald-400">₹{v} Cr</span> },
     { title: 'Available Escrow', key: 'remainingEscrowCr', render: (v) => `₹${v} Cr` },
     {
       title: 'Status',
