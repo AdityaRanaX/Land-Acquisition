@@ -39,3 +39,5 @@ export const ForgotPasswordPage = () => {
     </div>
   );
 };
+
+export default UnauthorizedPage;
